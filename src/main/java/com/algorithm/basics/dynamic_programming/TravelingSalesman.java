@@ -1,5 +1,7 @@
 package com.algorithm.basics.dynamic_programming;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * 
  * @Description:TODO 旅行推销员问题(动态规划)
@@ -30,7 +32,29 @@ public class TravelingSalesman {
 	 * @param p
 	 */
 	public void travel(int [][] w,int [][] p){
-		
+		int n = w.length;
+		System.out.println("顶点有："+n+"个");
+		for(int k=0;k<=n-2;k++){
+			System.out.println(0);
+			for(int i = 0;i<w.length;i++){
+				if(i==k){
+					continue;
+				}
+				System.out.println("--"+i);
+			}
+//			for(int i =0;i<n;i++){//要经过的顶级集合A
+//				System.out.println("["+i+"]["+j+"]");
+//			}
+//			for(int j = i+1;j<w.length;j++){
+//				System.out.println("["+i+"]["+j+"]");
+//				for(int k=1;k<w.length;k++){
+//					if(j==k){
+//						continue;
+//					}
+//					System.out.println("  ["+j+"]["+k+"]");
+//				}
+//			}
+		}
 	}
 	
 	public static void main(String[] args) {
