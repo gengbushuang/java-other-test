@@ -1,10 +1,10 @@
 package com.algorithm.basics.divide_and_conquer;
 
 /**
- * 分治法 二分法查找
- * 
+ * @Description:TODO 二分法查找(分治法)
  * @author gbs
- *
+ * @Date 2016年10月21日 上午10:59:33
+ * @version
  */
 public class BinarySearch {
 
@@ -18,6 +18,16 @@ public class BinarySearch {
 		System.out.println(index2);
 	}
 
+	/**
+	 * 
+	 * @Title: search 
+	 * @Description
+	 * @param a
+	 * @param k
+	 * @param left
+	 * @param right
+	 * @return
+	 */
 	public int search(int a[], int k, int left, int right) {
 		if (a[left] == k) {
 			return left;
@@ -29,7 +39,7 @@ public class BinarySearch {
 	}
 
 	/**
-	 * 递归版本的查找
+	 * @Description:TODO 递归版本的查找(二分法查找)
 	 * 
 	 * @param a
 	 * @param left
@@ -51,7 +61,7 @@ public class BinarySearch {
 	}
 
 	/**
-	 * 非递归版本查找
+	 * @Description:TODO 非递归版本查找(二分法查找)
 	 * 
 	 * @param a
 	 * @param k

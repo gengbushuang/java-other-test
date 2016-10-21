@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * 分治法 合并排序
  * 
+ * @Description:TODO 合并排序(分治法)
  * @author gbs
- *
+ * @Date 2016年10月21日 上午11:13:03
  */
 public class MergeSort {
 

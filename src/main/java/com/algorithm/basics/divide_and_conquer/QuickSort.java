@@ -4,10 +4,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * 分治法 快速排序
- * 
+ * @Description:TODO 快速排序(分治法)
  * @author gbs
- *
+ * @Date 2016年10月21日 上午11:13:34
  */
 public class QuickSort {
 
@@ -38,6 +37,7 @@ public class QuickSort {
 		int tmp = a[left];
 		int l = left, r = right;
 		//这是改进后的
+		//l的下标保持在中间值前一个
 		for(int i=l+1;i<=r;i++){
 			if(tmp>a[i]){
 				l++;

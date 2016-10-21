@@ -1,10 +1,10 @@
 package com.algorithm.basics.dynamic_programming;
 
 /**
- * 动态规划
- * Floyd最短路径
+ * 
+ * @Description:TODO Floyd最短路径(动态规划)
  * @author gbs
- *
+ * @Date 2016年10月21日 上午11:18:31
  */
 public class FloydPath {
 

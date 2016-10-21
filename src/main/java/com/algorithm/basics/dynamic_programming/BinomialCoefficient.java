@@ -1,10 +1,11 @@
 package com.algorithm.basics.dynamic_programming;
 
+
 /**
- * 动态规划
- * 二项式系数
+ * 
+ * @Description:TODO 二项式系数(动态规划)
  * @author gbs
- *
+ * @Date 2016年10月21日 上午11:17:04
  */
 public class BinomialCoefficient {
 
@@ -18,7 +19,9 @@ public class BinomialCoefficient {
 	}
 	
 	/**
-	 * 递归实现方式
+	 * 
+	 * @Description: TODO 递归实现方式(二项式系数)
+	 * @author gbs
 	 * @param x
 	 * @param y
 	 * @return
@@ -44,7 +47,9 @@ public class BinomialCoefficient {
 	}
 	
 	/**
-	 * 非递归方式
+	 * 
+	 * @Description: TODO 非递归方式(二项式系数)
+	 * @author gbs
 	 * @param x
 	 * @param y
 	 * @return

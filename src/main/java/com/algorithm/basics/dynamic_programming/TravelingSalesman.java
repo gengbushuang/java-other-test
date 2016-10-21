@@ -1,9 +1,10 @@
 package com.algorithm.basics.dynamic_programming;
 
 /**
- * 旅行推销员问题
+ * 
+ * @Description:TODO 旅行推销员问题(动态规划)
  * @author gbs
- *
+ * @Date 2016年10月21日 上午11:21:47
  */
 public class TravelingSalesman {
 	static int[][] createArrays(){
