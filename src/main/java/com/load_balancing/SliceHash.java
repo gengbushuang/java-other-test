@@ -16,7 +16,16 @@ public class SliceHash {
 	
 	CRC32 crc32 = new CRC32();
 	
-	public void shard_key(String key,int total_elements) throws UnsupportedEncodingException{
+	/**
+	 * 
+	 * @Description: TODO
+	 * @author gbs
+	 * @param key
+	 * @param total_elements
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public long shard_key(String key,int total_elements) throws UnsupportedEncodingException{
 		long shard_id = 0;
 		if (StringUtils.isNumeric(key)) {
 			shard_id = toBinary(key);
@@ -25,7 +34,7 @@ public class SliceHash {
 			crc32.update(key.getBytes("ISO-8859-1"));
 			shard_id = crc32.getValue() % shards;
 		}
-		System.out.println(shard_id);
+		return shard_id;
 	}
 	
 	private int toBinary(String key){
@@ -35,34 +44,24 @@ public class SliceHash {
 		return binaryInt;
 	}
 	
+	
+	
 	public static void main(String[] args) throws UnsupportedEncodingException {
-//		String key = "fdfsffdf";
-//		SliceHash sliceHash = new SliceHash();
-//		for(int i = 0;i<1000;i++){
-//		sliceHash.shard_key(String.valueOf(8),100);
-//		}
+		String key = "10";
+		SliceHash sliceHash = new SliceHash();
+		long shard_key = sliceHash.shard_key(key,100);
+		System.out.println(shard_key);
 		
-		UUID randomUUID = UUID.randomUUID();
-		String str = randomUUID.toString();
-		System.out.println(str);
-		String replaceAll = str.replaceAll("-", "");
-		System.out.println(replaceAll);
-		String substring = replaceAll.substring(0, 15);
-		System.out.println(substring+":"+substring.length());
+//		UUID randomUUID = UUID.randomUUID();
+//		String str = randomUUID.toString();
+//		System.out.println(str);
+//		String replaceAll = str.replaceAll("-", "");
+//		System.out.println(replaceAll);
+//		String substring = replaceAll.substring(0, 15);
+//		System.out.println(substring+":"+substring.length());
+//		Long valueOf = Long.valueOf(substring, 16);
+//		System.out.println(valueOf);
 		
-		char[] chars = substring.toCharArray();
-		StringBuilder sb = new StringBuilder("");
-		byte[] bs = substring.getBytes();
-		int bit;
-
-		for (int i = 0; i < bs.length; i++) {
-			bit = (bs[i] & 0x0f0) >> 4;
-			sb.append(chars[bit]);
-			bit = bs[i] & 0x0f;
-			sb.append(chars[bit]);
-		}
-		
-		System.out.println(sb.toString().trim());
 		
 	}
 }
