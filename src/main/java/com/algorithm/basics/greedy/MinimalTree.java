@@ -1,7 +1,12 @@
 package com.algorithm.basics.greedy;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import com.data_structure.tree.DisjSets;
 
 /**
  * 
@@ -12,13 +17,20 @@ import java.util.List;
 public class MinimalTree {
 
 	static int[][] createArrays() {
-		int[][] w = { { 0, 1, 3, Short.MAX_VALUE, Short.MAX_VALUE }, { 1, 0, 3, 6, Short.MAX_VALUE }, { 3, 3, 0, 4, 2 }, { Short.MAX_VALUE, 6, 4, 0, 5 }, { Short.MAX_VALUE, Short.MAX_VALUE, 2, 5, 0 } };
+		int[][] w = { 
+				{ 0, 1, 3, Short.MAX_VALUE, Short.MAX_VALUE }, 
+				{ 1, 0, 3, 6, Short.MAX_VALUE }, 
+				{ 3, 3, 0, 4, 2 }, 
+				{ Short.MAX_VALUE, 6, 4, 0, 5 }, 
+				{ Short.MAX_VALUE, Short.MAX_VALUE, 2, 5, 0 } 
+				};
 		return w;
 	}
 
 	public static void main(String[] args) {
 		MinimalTree tree = new MinimalTree();
-		tree.prim();
+//		tree.prim();
+		tree.kruskal();
 	}
 
 	/**
@@ -61,4 +73,69 @@ public class MinimalTree {
 		}
 		System.out.println(list);
 	}
+	
+	
+	/**
+	 * 
+	 * @Description: TODO kruskal生成最小树
+	 * @author gbs
+	 */
+	public void kruskal() {
+		// 要用到不相交数据结构
+		// 先把每个相连的边按权重从小大大排序
+		int[][] ww = createArrays();
+		for (int x = 0; x < ww.length; x++) {
+			for (int y = x + 1; y < ww.length; y++) {
+				if (ww[x][y] < Short.MAX_VALUE) {
+					System.out.println("[" + (x + 1) + "][" + (y + 1) + "]=" + ww[x][y]);
+					priorityQueue.add(new Eege(x + 1, y + 1, +ww[x][y]));
+				}
+			}
+		}
+		///
+		DisjSets disjSets = new DisjSets(ww.length+1);
+		while(!priorityQueue.isEmpty()){
+			Eege poll = priorityQueue.poll();
+			int x = poll.getX();
+			int y = poll.getY();
+			int find1 = disjSets.find(x);
+			int find2 = disjSets.find(y);
+			if(!disjSets.equal(find1, find2)){
+				disjSets.union(find1, find2);
+				System.out.println(poll);
+			}
+		}
+	}
+	
+	class Eege{
+		private int x;
+		private int y;
+		private int weigth;
+		public Eege(int x,int y,int weight){
+			this.x = x;
+			this.y = y;
+			this.weigth = weight;
+		}
+		public int getX() {
+			return x;
+		}
+		public int getY() {
+			return y;
+		}
+		public int getWeigth() {
+			return weigth;
+		}
+		@Override
+		public String toString() {
+			return "Eege [x=" + x + ", y=" + y + ", weigth=" + weigth + "]";
+		}
+	}
+	
+	Queue<Eege> priorityQueue =  new PriorityQueue<Eege>(11,new Comparator<Eege>() {
+
+		@Override
+		public int compare(Eege o1, Eege o2) {
+			return o1.getWeigth()-o2.getWeigth();
+		}
+	}); 
 }
