@@ -217,11 +217,116 @@ public class ImgHash {
 		return threshold;
 	}
 
+	// //////////////////////////////////////////
+	public BufferedImage pHash(BufferedImage image) {
+		// 把图片缩小到32x32的尺寸，并转为灰度模式
+		BufferedImage bufferedImage = resize(image, 32, 32);
+		BufferedImage grayImage = gray(bufferedImage);
+		// 对图片进行二维余弦变换
+		double[][] array = toArray(grayImage);
+		int[][] dct = DCT(array, 32);
+		BufferedImage tmp = new BufferedImage(32, 32, BufferedImage.TYPE_INT_BGR);
+		for (int i = 0; i < 32; i++) {
+			for (int j = 0; j < 32; j++) {
+				System.out.print(dct[i][j] + " ");
+				tmp.setRGB(i, j, dct[i][j]);
+			}
+			System.out.println();
+		}
+		return tmp;
+	}
+
+	private int[][] DCT(double[][] array, int n) {
+		double[][] coeff = coeff(n);
+		double[][] coeft = coeft(coeff, n);
+
+		double[][] ds = matrixMultiply(coeff, array, n);
+		double[][] ds2 = matrixMultiply(ds, coeft, n);
+
+		int newpix[][] = new int[n][n];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				newpix[i][j] = (int) ds2[i][j];
+			}
+		}
+		return newpix;
+	}
+
+	private double[][] toArray(BufferedImage image) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		double[][] tmp = new double[width][height];
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				int rgb = image.getRGB(i, j);
+				long h = 0xFFFFFFFFL & rgb;
+				tmp[i][j] = h;
+			}
+		}
+		return tmp;
+	}
+
+	private double[][] coeff(int n) {
+		double[][] dct_coef = new double[n][n];
+		double sqrt_1 = 1.0 / Math.sqrt(n);
+		for (int i = 0; i < n; i++) {
+			dct_coef[0][i] = sqrt_1;
+		}
+		for (int i = 1; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				dct_coef[i][j] = Math.sqrt(2.0 / n) * Math.cos(i * Math.PI * (j + 0.5) / ((double) n));
+			}
+		}
+		return dct_coef;
+	}
+
+	private double[][] coeft(double[][] coef, int n) {
+		double[][] dct_coeft = new double[n][n];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				dct_coeft[i][j] = coef[j][i];
+			}
+		}
+		return dct_coeft;
+	}
+
+	private double[][] matrixMultiply(double[][] A, double[][] B, int n) {
+		double nMatrix[][] = new double[n][n];
+		double t = 0.0;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				t = 0;
+				for (int k = 0; k < n; k++) {
+					t += A[i][k] * B[k][j];
+				}
+				nMatrix[i][j] = t;
+			}
+		}
+		return nMatrix;
+	}
+
 	public static void main(String[] args) throws IOException {
 		ImgHash imgHash = new ImgHash();
-		BufferedImage bufferedImage = ImageIO.read(new File("/Users/gbs/tmp/rt"));
-//		imgHash.avhash(bufferedImage);
-		BufferedImage image = imgHash.ContentCharacteristic(bufferedImage);
+		BufferedImage bufferedImage = ImageIO.read(new File("/Users/gbs/tmp/tm.jpg"));
+		// imgHash.avhash(bufferedImage);
+//		BufferedImage image = imgHash.ContentCharacteristic(bufferedImage);
+		BufferedImage image = imgHash.pHash(bufferedImage);
 		ImageIO.write(image, "gif", new FileOutputStream(new File("/Users/gbs/tmp/rt_2")));
+
+		// for (int i = 1; i < 4; i++) {
+		// for (int j = 0; j < 4; j++) {
+		// double t = ((i) * (2 * j + 1)) / 8.0;
+		// System.out.print(t + " ");
+		// }
+		// System.out.println();
+		// }
+		// System.out.println("-------------------");
+		// for (int i = 1; i < 4; i++) {
+		// for (int j = 0; j < 4; j++) {
+		// double t = i * (j + 0.5) / ((double) 4);
+		// System.out.print(t + " ");
+		// }
+		// System.out.println();
+		// }
 	}
 }
