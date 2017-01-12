@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
  */
 public class ImgHash {
 
-	public void avhash(BufferedImage image) throws FileNotFoundException, IOException {
+	public void avhash(BufferedImage image) {
 		// 第一步，缩小尺寸,8*8
 		BufferedImage bufferedImage = resize(image, 8, 8);
 		// 第二步，简化色彩-将缩小后的图片，转为64级灰度。也就是说，所有像素点总共只有64种颜色。
@@ -29,11 +29,10 @@ public class ImgHash {
 		String compareAvg = compareAvg(grayImage, avg);
 		// 第五步，计算哈希值。将上一步的比较结果，组合在一起，就构成了一个64位的整数，这就是这张图片的指纹。组合的次序并不重要，只要保证所有图片都采用同样次序就行了。
 		String hashValue = createHash(compareAvg);
+		System.out.println(hashValue);
 	}
 
 	private String createHash(String compareAvg) {
-		System.out.println(compareAvg);
-		// System.out.println(compareAvg.length());
 		StringBuilder sb = new StringBuilder(17);
 		for (int i = 0, n = compareAvg.length() / 4; i < n; i++) {
 			String substring = compareAvg.substring(i * 4, (i + 1) * 4);
@@ -41,7 +40,6 @@ public class ImgHash {
 			String hexString = Integer.toHexString(valueOf.intValue());
 			sb.append(hexString);
 		}
-		 System.out.println(sb.toString());
 		return sb.toString();
 	}
 
@@ -49,7 +47,7 @@ public class ImgHash {
 		StringBuilder sb = new StringBuilder(65);
 		for (int i = 0; i < bufferedImage.getWidth(); i++) {
 			for (int j = 0; j < bufferedImage.getHeight(); j++) {
-				if (bufferedImage.getRGB(i, j) >= avg) {
+				if ((bufferedImage.getRGB(i, j) & 0xff) >= avg) {
 					sb.append("1");
 				} else {
 					sb.append("0");
@@ -63,12 +61,9 @@ public class ImgHash {
 		long sum = 0;
 		for (int i = 0; i < bufferedImage.getWidth(); i++) {
 			for (int j = 0; j < bufferedImage.getHeight(); j++) {
-				sum += bufferedImage.getRGB(i, j);
-				// System.out.println(sum);
+				sum += (bufferedImage.getRGB(i, j) & 0xff);
 			}
 		}
-		// System.out.println(sum);
-		// System.out.println(sum/64);
 		return (sum / 64);
 	}
 
@@ -128,17 +123,14 @@ public class ImgHash {
 
 	// -------------------------------------
 
-	public void ContentCharacteristic(BufferedImage image) throws FileNotFoundException, IOException {
+	public BufferedImage ContentCharacteristic(BufferedImage image) throws FileNotFoundException, IOException {
 		BufferedImage bufferedImage = resize(image, 50, 50);
 		BufferedImage grayImage = gray(bufferedImage);
 		int thresholder = otsuThresholder(grayImage);
-		BufferedImage test = test(thresholder,grayImage);
-		
-		ImageIO.write(test, "jpg", new FileOutputStream(new File("/Users/gbs/tmp/rt_2")));
+		BufferedImage test = test(thresholder, grayImage);
+		return test;
 	}
 
-	
-	
 	private BufferedImage test(int thresholder, BufferedImage grayImage) {
 		int width = grayImage.getWidth();
 		int height = grayImage.getHeight();
@@ -148,7 +140,7 @@ public class ImgHash {
 				int rgb = grayImage.getRGB(i, j);
 				int h = 0xFF & rgb;
 				int newPixel = 0;
-				if(h<=thresholder){
+				if (h >= thresholder) {
 					newPixel = 16777215;
 				}
 				tmp.setRGB(i, j, newPixel);
@@ -159,6 +151,7 @@ public class ImgHash {
 
 	/**
 	 * otsu大律法
+	 * 
 	 * @Description: TODO
 	 * @author gbs
 	 * @param grayImage
@@ -168,7 +161,7 @@ public class ImgHash {
 		int width = grayImage.getWidth();
 		int height = grayImage.getHeight();
 		int ptr = 0;
-		//生成直方图数据
+		// 生成直方图数据
 		int[] histData = new int[256];
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
@@ -185,14 +178,14 @@ public class ImgHash {
 		float sum = 0;
 		for (int t = 0; t < 256; t++) {
 			sum += t * histData[t];
-			//System.out.println(t + "=" + histData[t]);
+			// System.out.println(t + "=" + histData[t]);
 		}
 		System.out.println("float sum=" + sum);
 
 		float sumB = 0;
 		int wB = 0;
 		int wF = 0;
-		
+
 		float varMax = 0;
 		int threshold = 0;
 
@@ -218,16 +211,17 @@ public class ImgHash {
 				varMax = varBetween;
 				threshold = t;
 			}
-			//System.out.println(t + "=" + varBetween+","+varMax+","+histData[threshold]);
+			// System.out.println(t + "=" +
+			// varBetween+","+varMax+","+histData[threshold]);
 		}
 		return threshold;
 	}
 
 	public static void main(String[] args) throws IOException {
-		System.out.println(0xFF&400);
 		ImgHash imgHash = new ImgHash();
-		BufferedImage bufferedImage = ImageIO.read(new File("/Users/gbs/tmp/400x400_1.jpg"));
+		BufferedImage bufferedImage = ImageIO.read(new File("/Users/gbs/tmp/rt"));
 //		imgHash.avhash(bufferedImage);
-		imgHash.ContentCharacteristic(bufferedImage);
+		BufferedImage image = imgHash.ContentCharacteristic(bufferedImage);
+		ImageIO.write(image, "gif", new FileOutputStream(new File("/Users/gbs/tmp/rt_2")));
 	}
 }
