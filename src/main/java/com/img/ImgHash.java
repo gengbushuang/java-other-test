@@ -124,7 +124,7 @@ public class ImgHash {
 	// -------------------------------------
 
 	public BufferedImage ContentCharacteristic(BufferedImage image) throws FileNotFoundException, IOException {
-		BufferedImage bufferedImage = resize(image, 50, 50);
+		BufferedImage bufferedImage = resize(image, image.getWidth(), image.getHeight());
 		BufferedImage grayImage = gray(bufferedImage);
 		int thresholder = otsuThresholder(grayImage);
 		BufferedImage test = test(thresholder, grayImage);
@@ -218,22 +218,43 @@ public class ImgHash {
 	}
 
 	// //////////////////////////////////////////
-	public BufferedImage pHash(BufferedImage image) {
+	public void pHash(BufferedImage image) {
 		// 把图片缩小到32x32的尺寸，并转为灰度模式
 		BufferedImage bufferedImage = resize(image, 32, 32);
 		BufferedImage grayImage = gray(bufferedImage);
 		// 对图片进行二维余弦变换
 		double[][] array = toArray(grayImage);
 		int[][] dct = DCT(array, 32);
-		BufferedImage tmp = new BufferedImage(32, 32, BufferedImage.TYPE_INT_BGR);
-		for (int i = 0; i < 32; i++) {
-			for (int j = 0; j < 32; j++) {
-				System.out.print(dct[i][j] + " ");
-				tmp.setRGB(i, j, dct[i][j]);
+		
+		long avgInt = avgInt(dct,8,8);
+		System.out.println("avgInt-->"+avgInt);
+		String compareAvg = compareAvg(dct,8,8,avgInt);
+		String hashValue = createHash(compareAvg);
+		System.out.println(hashValue);
+	}
+
+	private String compareAvg(int[][] dct,int w,int h, long avgInt) {
+		StringBuilder sb = new StringBuilder(65);
+		for(int i = 0;i<w;i++){
+			for(int j=0;j<h;j++){
+				if(dct[i][j]>=avgInt){
+					sb.append("1");
+				} else {
+					sb.append("0");
+				}
 			}
-			System.out.println();
 		}
-		return tmp;
+		return sb.toString();
+	}
+
+	private long avgInt(int[][] dct, int w, int h) {
+		long sum = 0;
+		for(int i = 0;i<w;i++){
+			for(int j=0;j<h;j++){
+				sum+=dct[i][j];
+			}
+		}
+		return (sum/64);
 	}
 
 	private int[][] DCT(double[][] array, int n) {
@@ -259,7 +280,7 @@ public class ImgHash {
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
 				int rgb = image.getRGB(i, j);
-				long h = 0xFFFFFFFFL & rgb;
+				int h = 0xFF & rgb;
 				tmp[i][j] = h;
 			}
 		}
@@ -310,8 +331,8 @@ public class ImgHash {
 		BufferedImage bufferedImage = ImageIO.read(new File("/Users/gbs/tmp/tm.jpg"));
 		// imgHash.avhash(bufferedImage);
 //		BufferedImage image = imgHash.ContentCharacteristic(bufferedImage);
-		BufferedImage image = imgHash.pHash(bufferedImage);
-		ImageIO.write(image, "gif", new FileOutputStream(new File("/Users/gbs/tmp/rt_2")));
+		imgHash.pHash(bufferedImage);
+//		ImageIO.write(image, "jpg", new FileOutputStream(new File("/Users/gbs/tmp/rt_2")));
 
 		// for (int i = 1; i < 4; i++) {
 		// for (int j = 0; j < 4; j++) {
@@ -321,12 +342,12 @@ public class ImgHash {
 		// System.out.println();
 		// }
 		// System.out.println("-------------------");
-		// for (int i = 1; i < 4; i++) {
-		// for (int j = 0; j < 4; j++) {
-		// double t = i * (j + 0.5) / ((double) 4);
-		// System.out.print(t + " ");
-		// }
-		// System.out.println();
-		// }
+//		for (int i = 1; i < 4; i++) {
+//			for (int j = 0; j < 4; j++) {
+//				double t = Math.sqrt(2.0 / 4) * Math.cos(i * Math.PI * (j + 0.5) / ((double) 4));
+//				System.out.print(t + " ");
+//			}
+//			System.out.println();
+//		}
 	}
 }
