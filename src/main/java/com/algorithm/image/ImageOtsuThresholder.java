@@ -100,9 +100,9 @@ public class ImageOtsuThresholder {
 
 	public static void main(String[] args) throws IOException, ImageException {
 		ImageOtsuThresholder otsuThresholder = new ImageOtsuThresholder();
-		BufferedImage bufferedImage = ImageIO.read(new File("/Users/gbs/tmp/tm.jpg"));
+		BufferedImage bufferedImage = ImageIO.read(new File("F:/tmp/IMG_1179.JPG"));
 		BitSet bitSet = otsuThresholder.avhash(bufferedImage);
-		BufferedImage bufferedImage2 = ImageIO.read(new File("/Users/gbs/tmp/t.png"));
+		BufferedImage bufferedImage2 = ImageIO.read(new File("F:/tmp/IMG_1182.JPG"));
 		BitSet bitSet2 = otsuThresholder.avhash(bufferedImage2);
 		
 		bitSet.xor(bitSet2);
