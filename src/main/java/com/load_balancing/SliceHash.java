@@ -1,7 +1,6 @@
 package com.load_balancing;
 
 import java.io.UnsupportedEncodingException;
-import java.util.UUID;
 import java.util.zip.CRC32;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,26 +41,5 @@ public class SliceHash {
 		String binaryString = Integer.toBinaryString(decimalInt);
 		int binaryInt = Integer.parseInt(binaryString, 10);
 		return binaryInt;
-	}
-	
-	
-	
-	public static void main(String[] args) throws UnsupportedEncodingException {
-		String key = "10";
-		SliceHash sliceHash = new SliceHash();
-		long shard_key = sliceHash.shard_key(key,100);
-		System.out.println(shard_key);
-		
-//		UUID randomUUID = UUID.randomUUID();
-//		String str = randomUUID.toString();
-//		System.out.println(str);
-//		String replaceAll = str.replaceAll("-", "");
-//		System.out.println(replaceAll);
-//		String substring = replaceAll.substring(0, 15);
-//		System.out.println(substring+":"+substring.length());
-//		Long valueOf = Long.valueOf(substring, 16);
-//		System.out.println(valueOf);
-		
-		
 	}
 }
