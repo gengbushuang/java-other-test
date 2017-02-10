@@ -10,7 +10,6 @@ public class ClassLoaderTest {
 
 			@Override
 			public Class<?> loadClass(String name) throws ClassNotFoundException {
-				// TODO Auto-generated method stub
 				System.out.println("name-->"+name);
 				try {
 					String fileName = name.substring(name.lastIndexOf(".") + 1) + ".class";

@@ -1,4 +1,4 @@
-package com.loadclass;
+package com.load_balancing;
 
 import java.util.List;
 import java.util.SortedMap;
