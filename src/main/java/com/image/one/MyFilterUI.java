@@ -3,6 +3,8 @@ package com.image.one;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -66,6 +68,7 @@ public class MyFilterUI extends JFrame implements ActionListener {
 		this.zoomBtn.addActionListener(this);
 		this.browserBtn.addActionListener(this);
 	}
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -77,6 +80,7 @@ public class MyFilterUI extends JFrame implements ActionListener {
 				File f = chooser.getSelectedFile();
 				srcImage = ImageIO.read(f);
 				filters.setImage(srcImage);
+				filters.setDescImage(srcImage);
 				filters.repaint();
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -85,16 +89,20 @@ public class MyFilterUI extends JFrame implements ActionListener {
 		}
 
 		if (GRAY_CMD.equals(e.getActionCommand())) {
-			filters.doColorGray(srcImage);
+			BufferedImage doColorGray = filters.doColorGray(srcImage);
+			filters.setDescImage(doColorGray);
 			filters.repaint();
 		} else if (BINARY_CMD.equals(e.getActionCommand())) {
-			filters.doBinaryImage(srcImage);
+			BufferedImage doBinaryImage = filters.doBinaryImage(srcImage);
+			filters.setDescImage(doBinaryImage);
 			filters.repaint();
 		} else if (BLUR_CMD.equals(e.getActionCommand())) {
-			filters.doBlur(srcImage);
+			BufferedImage doBlur = filters.doBlur(srcImage);
+			filters.setDescImage(doBlur);
 			filters.repaint();
 		} else if (ZOOM_CMD.equals(e.getActionCommand())) {
-			filters.doScale(srcImage, 1.5, 1.5);
+			BufferedImage doScale = filters.doScale(srcImage, 1.5, 1.5);
+			filters.setDescImage(doScale);
 			filters.repaint();
 		} else if (BROWSER_CMD.equals(e.getActionCommand())) {
 			try {
@@ -103,6 +111,7 @@ public class MyFilterUI extends JFrame implements ActionListener {
 				File f = chooser.getSelectedFile();
 				srcImage = ImageIO.read(f);
 				filters.setImage(srcImage);
+				filters.setDescImage(srcImage);
 				filters.repaint();
 			} catch (IOException e1) {
 				e1.printStackTrace();

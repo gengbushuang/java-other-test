@@ -1,5 +1,7 @@
 package com.image.one;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
@@ -13,11 +15,22 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.awt.image.LookupOp;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class MyFilters extends JPanel{
+	
+	
+	private JButton srcButton;
+	private JButton descButton;
 
 	private BufferedImage srcImage;
+	private BufferedImage descImage;
+	
+	public MyFilters(){
+		
+	}
+	
 	/**
 	 * 用于实现各种色彩空间的转换
 	 * 
@@ -103,11 +116,20 @@ public class MyFilters extends JPanel{
 	protected void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D)g;
 		if(srcImage != null){
-			g2d.drawImage(srcImage, 0, 0, 400, 300, null);
+			g2d.drawImage(srcImage, 10, 10, 300, 300, null);
 		}
+		
+		if(descImage!=null){
+			g2d.drawImage(descImage, 320, 10, 300, 300, null);
+		}
+		
 	}
 	
 	public void setImage(BufferedImage srcImage) {
 		this.srcImage = srcImage;
+	}
+
+	public void setDescImage(BufferedImage descImage) {
+		this.descImage = descImage;
 	}
 }
