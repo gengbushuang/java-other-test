@@ -35,8 +35,12 @@ public class ImagePanel extends JPanel {
 	public void setDestImage(BufferedImage destImage) {
 		this.destImage = destImage;
 	}
-
-	public void process(){}
+	BrightFilter filter = new BrightFilter(1.5f);
+//	SaturationFilter filter = new SaturationFilter(0.15);
+//	SepiaToneFilter filter = new SepiaToneFilter();
+	public void process(){
+		this.destImage = filter.filter(sourceImage, null);
+	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
