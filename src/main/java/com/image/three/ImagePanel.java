@@ -1,4 +1,4 @@
-package com.image.two;
+package com.image.three;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import com.image.three.ContrastFilter;
+import com.image.four.ContrastFilter;
 
 public class ImagePanel extends JPanel {
 

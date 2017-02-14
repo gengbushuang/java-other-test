@@ -1,4 +1,4 @@
-package com.image.two;
+package com.image.three;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,6 +17,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.image.four.BrightContrastSatUI;
 
 public class MainUI extends JFrame implements ActionListener{
 
@@ -49,8 +51,21 @@ public class MainUI extends JFrame implements ActionListener{
 	}
 	
 	private void setupActionListener() {
-		this.imgBtn.addActionListener(this);
-		this.processBtn.addActionListener(this);
+		final BrightContrastSatUI bcsUI = new BrightContrastSatUI(this);
+		bcsUI.setupActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				bcsUI.setVisible(true);
+				bcsUI.dispose();
+				double s = bcsUI.getSaturation();
+				double b = bcsUI.getBright();
+				double c = bcsUI.getContrast();
+				System.out.println(s+","+b+","+c);
+			}
+		});
+		bcsUI.showUI();
+//		this.imgBtn.addActionListener(this);
+//		this.processBtn.addActionListener(this);
 	}
 	
 	@Override
