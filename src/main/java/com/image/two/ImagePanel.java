@@ -1,10 +1,12 @@
-package com.image.one;
+package com.image.two;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
+
+import com.image.three.ContrastFilter;
 
 public class ImagePanel extends JPanel {
 
@@ -35,7 +37,8 @@ public class ImagePanel extends JPanel {
 	public void setDestImage(BufferedImage destImage) {
 		this.destImage = destImage;
 	}
-	BrightFilter filter = new BrightFilter(1.5f);
+	ContrastFilter filter = new ContrastFilter(50);
+//	BrightFilter filter = new BrightFilter(1.5f);
 //	SaturationFilter filter = new SaturationFilter(0.15);
 //	SepiaToneFilter filter = new SepiaToneFilter();
 	public void process(){

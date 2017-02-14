@@ -1,4 +1,4 @@
-package com.image.one;
+package com.image.three;
 
 import java.awt.image.BufferedImage;
 

@@ -1,4 +1,4 @@
-package com.image.one;
+package com.image.two;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
