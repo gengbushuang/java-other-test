@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import com.image.four.ContrastFilter;
+import com.image.six.PixelStatisticFilter;
 
 public class ImagePanel extends JPanel {
 
@@ -37,7 +38,9 @@ public class ImagePanel extends JPanel {
 	public void setDestImage(BufferedImage destImage) {
 		this.destImage = destImage;
 	}
-	ContrastFilter filter = new ContrastFilter(50);
+	
+	PixelStatisticFilter filter = new PixelStatisticFilter();
+//	ContrastFilter filter = new ContrastFilter(50);
 //	BrightFilter filter = new BrightFilter(1.5f);
 //	SaturationFilter filter = new SaturationFilter(0.15);
 //	SepiaToneFilter filter = new SepiaToneFilter();
