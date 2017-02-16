@@ -6,6 +6,12 @@ import java.util.List;
 
 import com.image.four.AbstractBufferedImageOp;
 
+/**
+ * 灰度二值化，图片要先转换为灰度
+ * @Description:TODO
+ * @author gbs
+ * @date 2017年2月16日 下午9:03:50
+ */
 public class BinaryFilter extends AbstractBufferedImageOp {
 
 	public final static int MEAN_THRESHOLD = 2;

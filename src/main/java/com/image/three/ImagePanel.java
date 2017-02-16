@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
+import com.image.six.BinaryFilter;
 import com.image.six.HistogramDataExtractor;
 import com.image.six.HistogramPanel;
 import com.image.six.RedLineMonitor;
@@ -47,26 +48,27 @@ public class ImagePanel extends JPanel {
 //	BrightFilter filter = new BrightFilter(1.5f);
 //	SaturationFilter filter = new SaturationFilter(0.15);
 //	SepiaToneFilter filter = new SepiaToneFilter();
-	HistogramDataExtractor extractor = new HistogramDataExtractor();
+//	HistogramDataExtractor extractor = new HistogramDataExtractor();
+	BinaryFilter filter = new BinaryFilter(); 
 	public void process(){
-//		this.destImage = filter.filter(sourceImage, null);
-		this.destImage = extractor.filter(sourceImage, null);
-		int[] histogram = extractor.getHistogram();
+		this.destImage = filter.filter(sourceImage, null);
 		////
-		final HistogramPanel uPanel = new HistogramPanel(this.destImage,histogram);
-		RedLineMonitor lineMonitor = new RedLineMonitor(uPanel);
-		uPanel.addMouseListener(lineMonitor);
-		uPanel.addMouseMotionListener(lineMonitor);
-		uPanel.setupActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				extractor.setThreshold(uPanel.getThreshold());
-				destImage = extractor.filter(sourceImage, null);
-				sss();
-			}
-			
-		});
-		uPanel.showUI();
+//		this.destImage = extractor.filter(sourceImage, null);
+//		int[] histogram = extractor.getHistogram();
+//		final HistogramPanel uPanel = new HistogramPanel(this.destImage,histogram);
+//		RedLineMonitor lineMonitor = new RedLineMonitor(uPanel);
+//		uPanel.addMouseListener(lineMonitor);
+//		uPanel.addMouseMotionListener(lineMonitor);
+//		uPanel.setupActionListener(new ActionListener(){
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				extractor.setThreshold(uPanel.getThreshold());
+//				destImage = extractor.filter(sourceImage, null);
+//				sss();
+//			}
+//			
+//		});
+//		uPanel.showUI();
 		
 	}
 	

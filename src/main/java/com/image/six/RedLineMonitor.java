@@ -56,7 +56,6 @@ public class RedLineMonitor extends MouseAdapter {
 		endX = e.getPoint().getX();
 		endY = e.getPoint().getY();
 		if (Math.abs(startX - endX) >= 0) {
-			System.out.println(endX);
 			callBack.mooveLine(endX);
 		}
 

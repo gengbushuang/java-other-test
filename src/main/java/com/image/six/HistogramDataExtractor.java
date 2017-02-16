@@ -53,6 +53,7 @@ public class HistogramDataExtractor extends AbstractBufferedImageOp {
 			}
 		}
 		if (threshold > 0) {
+			System.out.println(threshold);
 			int[] outPixels = new int[width * height];
 			for (int row = 0; row < height; row++) {
 				int ta = 0, tr = 0, tg = 0, tb = 0;
