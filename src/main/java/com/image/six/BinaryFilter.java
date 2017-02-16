@@ -1,4 +1,4 @@
-package com.image.one;
+package com.image.six;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -67,6 +67,7 @@ public class BinaryFilter extends AbstractBufferedImageOp {
 			for (int row = 0; row < height; row++) {
 				int tr = 0;
 				for (int col = 0; col < width; col++) {
+					index = row * width + col;
 					tr = (inPixels[index] >> 16) & 0xff;
 					sum += tr;
 				}

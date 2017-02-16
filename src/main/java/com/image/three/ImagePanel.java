@@ -2,12 +2,15 @@ package com.image.three;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import com.image.four.ContrastFilter;
-import com.image.six.PixelStatisticFilter;
+import com.image.six.HistogramDataExtractor;
+import com.image.six.HistogramPanel;
+import com.image.six.RedLineMonitor;
 
 public class ImagePanel extends JPanel {
 
@@ -39,13 +42,36 @@ public class ImagePanel extends JPanel {
 		this.destImage = destImage;
 	}
 	
-	PixelStatisticFilter filter = new PixelStatisticFilter();
+//	RGBHistogramFilter filter = new RGBHistogramFilter();
 //	ContrastFilter filter = new ContrastFilter(50);
 //	BrightFilter filter = new BrightFilter(1.5f);
 //	SaturationFilter filter = new SaturationFilter(0.15);
 //	SepiaToneFilter filter = new SepiaToneFilter();
+	HistogramDataExtractor extractor = new HistogramDataExtractor();
 	public void process(){
-		this.destImage = filter.filter(sourceImage, null);
+//		this.destImage = filter.filter(sourceImage, null);
+		this.destImage = extractor.filter(sourceImage, null);
+		int[] histogram = extractor.getHistogram();
+		////
+		final HistogramPanel uPanel = new HistogramPanel(this.destImage,histogram);
+		RedLineMonitor lineMonitor = new RedLineMonitor(uPanel);
+		uPanel.addMouseListener(lineMonitor);
+		uPanel.addMouseMotionListener(lineMonitor);
+		uPanel.setupActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				extractor.setThreshold(uPanel.getThreshold());
+				destImage = extractor.filter(sourceImage, null);
+				sss();
+			}
+			
+		});
+		uPanel.showUI();
+		
+	}
+	
+	public void sss(){
+		this.repaint();
 	}
 
 	@Override

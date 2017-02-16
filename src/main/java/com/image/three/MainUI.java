@@ -18,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.math3.exception.NullArgumentException;
+
 import com.image.four.BrightContrastSatUI;
 
 public class MainUI extends JFrame implements ActionListener{
@@ -51,6 +53,7 @@ public class MainUI extends JFrame implements ActionListener{
 	}
 	
 	private void setupActionListener() {
+		
 //		final BrightContrastSatUI bcsUI = new BrightContrastSatUI(this);
 //		bcsUI.setupActionListener(new ActionListener() {
 //			@Override
@@ -127,6 +130,7 @@ public class MainUI extends JFrame implements ActionListener{
 		pack();
 		setVisible(true);
 	}
+	
 	public static void main(String[] args) {
 		MainUI ui = new MainUI();
 		ui.openview();

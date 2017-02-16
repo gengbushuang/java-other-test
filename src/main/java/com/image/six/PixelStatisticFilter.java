@@ -76,7 +76,7 @@ public class PixelStatisticFilter extends AbstractBufferedImageOp {
 				outPixels[index] = (255 << 24) | (tr << 16) | (tr << 8) | tr;
 			}
 		}
-
+		
 		stdev = (sum / total) - Math.pow(mean, 2);
 		System.out.println("均值 = " + mean + "标准方差 ＝ " + stdev);
 		setRGB(dest, 0, 0, width, height, outPixels);

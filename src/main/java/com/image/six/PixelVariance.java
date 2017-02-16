@@ -3,9 +3,8 @@ package com.image.six;
 public class PixelVariance {
 
 	/**
-	 * 计算像素方差
-	 * stdev = (Sum(P[x,y]*P[x,y])/(X*Y))-(mean*mean)根方
-	 * var = stdev*stdev
+	 * 计算像素方差 stdev = (Sum(P[x,y]*P[x,y])/(X*Y))-(mean*mean)根方 var = stdev*stdev
+	 * 
 	 * @Description: TODO
 	 * @author gbs
 	 * @param width
@@ -13,7 +12,7 @@ public class PixelVariance {
 	 * @param pixels
 	 * @param mean
 	 */
-	public void variance(int width, int height, int[] pixels,int mean) {
+	public void variance(int width, int height, int[] pixels, int mean) {
 		int index = 0;
 		double sum = 0;
 		for (int row = 0; row < height; row++) {
@@ -24,6 +23,6 @@ public class PixelVariance {
 				sum += (tr * tr);
 			}
 		}
-		
+		double stdev = sum / (width * height) - Math.pow(mean, 2);
 	}
 }
