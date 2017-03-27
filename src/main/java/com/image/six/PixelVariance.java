@@ -3,7 +3,8 @@ package com.image.six;
 public class PixelVariance {
 
 	/**
-	 * 计算像素方差 stdev = (Sum(P[x,y]*P[x,y])/(X*Y))-(mean*mean)根方 var = stdev*stdev
+	 * 计算像素方差 stdev = (Sum(P[x,y]*P[x,y])/(X*Y))-(mean*mean)
+	 * 根方 var = stdev*stdev
 	 * 
 	 * @Description: TODO
 	 * @author gbs

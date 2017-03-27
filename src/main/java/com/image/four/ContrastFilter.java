@@ -73,8 +73,8 @@ public class ContrastFilter extends AbstractBufferedImageOp {
 		return dest;
 	}
 
-	public static int clamp(int c) {
-		return c > 255 ? 255 : (c < 0 ? 0 : c);
-	}
+//	public static int clamp(int c) {
+//		return c > 255 ? 255 : (c < 0 ? 0 : c);
+//	}
 
 }

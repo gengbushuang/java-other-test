@@ -54,7 +54,7 @@ public class SepiaToneFilter extends AbstractBufferedImageOp {
 		return (scale * dest + (1.0 - scale) * src);
 	}
 
-	public static int clamp(int c) {
-		return c > 255 ? 255 : (c < 0 ? 0 : c);
-	}
+//	public static int clamp(int c) {
+//		return c > 255 ? 255 : (c < 0 ? 0 : c);
+//	}
 }

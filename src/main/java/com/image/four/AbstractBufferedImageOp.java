@@ -30,6 +30,10 @@ public abstract class AbstractBufferedImageOp {
 		BufferedImage image = new BufferedImage(cm, cm.createCompatibleWritableRaster(src.getWidth(), src.getHeight()), cm.isAlphaPremultiplied(), properties);
 		return image;
 	}
+	
+	public int clamp(int c) {
+		return c > 255 ? 255 : (c < 0 ? 0 : c);
+	}
 
 	public abstract BufferedImage filter(BufferedImage src, BufferedImage dest);
 }

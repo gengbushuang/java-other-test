@@ -14,7 +14,8 @@ import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 public class PixelHistogram {
 
 	/**
-	 * P(g)=h(g)/M m=width*height,h(g)表示灰度为g的像素出现频率，g的取值范围为0～255之间。
+	 * ∑(g~255)P(g)=h(g)/M 
+	 * m=width*height,h(g)表示灰度为g的像素出现频率，g的取值范围为0～255之间。
 	 * 
 	 * @Description: TODO
 	 * @author gbs
@@ -34,7 +35,16 @@ public class PixelHistogram {
 				histogram[tr]++;
 			}
 		}
-
+		int [] newHistogram = new int[256];
+		//
+		for (int i = 0; i < 256; i++) {
+			int sum = 0;
+			for (int j = 0; j <= i; j++) {
+				sum += histogram[j] / width * height;
+			}
+			newHistogram[i] = sum;
+		}
+		
 		double maxFrequency = 0;
 		for (int i = 0; i < histogram.length; i++) {
 			maxFrequency = Math.max(maxFrequency, histogram[i]);

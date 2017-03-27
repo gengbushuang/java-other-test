@@ -9,7 +9,9 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import com.image.six.BinaryFilter;
+import com.image.six.GayEFilter;
 import com.image.six.HistogramDataExtractor;
+import com.image.six.HistogramEFilter;
 import com.image.six.HistogramPanel;
 import com.image.six.RedLineMonitor;
 
@@ -49,7 +51,9 @@ public class ImagePanel extends JPanel {
 //	SaturationFilter filter = new SaturationFilter(0.15);
 //	SepiaToneFilter filter = new SepiaToneFilter();
 //	HistogramDataExtractor extractor = new HistogramDataExtractor();
-	BinaryFilter filter = new BinaryFilter(); 
+//	BinaryFilter filter = new BinaryFilter(); 
+//	HistogramEFilter filter = new HistogramEFilter();
+	GayEFilter filter = new GayEFilter();
 	public void process(){
 		this.destImage = filter.filter(sourceImage, null);
 		////
