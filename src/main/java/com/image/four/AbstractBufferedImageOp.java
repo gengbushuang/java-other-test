@@ -25,10 +25,17 @@ public abstract class AbstractBufferedImageOp {
 		}
 	}
 
-	public BufferedImage createCompatibleDestImage(BufferedImage src, Hashtable<?, ?> properties) {
+	public BufferedImage createCompatibleDestImage(BufferedImage src,int width,int height,Hashtable<?, ?> properties){
 		ColorModel cm = src.getColorModel();
-		BufferedImage image = new BufferedImage(cm, cm.createCompatibleWritableRaster(src.getWidth(), src.getHeight()), cm.isAlphaPremultiplied(), properties);
+		BufferedImage image = new BufferedImage(cm, cm.createCompatibleWritableRaster(width, height), cm.isAlphaPremultiplied(), properties);
 		return image;
+	}
+	
+	public BufferedImage createCompatibleDestImage(BufferedImage src, Hashtable<?, ?> properties) {
+//		ColorModel cm = src.getColorModel();
+//		BufferedImage image = new BufferedImage(cm, cm.createCompatibleWritableRaster(src.getWidth(), src.getHeight()), cm.isAlphaPremultiplied(), properties);
+//		return image;
+		return createCompatibleDestImage(src, src.getWidth(), src.getHeight(), properties);
 	}
 	
 	public int clamp(int c) {

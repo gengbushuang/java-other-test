@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
+import com.image.seven.ZoomFilter;
 import com.image.six.BinaryFilter;
 import com.image.six.GayEFilter;
 import com.image.six.HistogramDataExtractor;
@@ -53,8 +54,10 @@ public class ImagePanel extends JPanel {
 //	HistogramDataExtractor extractor = new HistogramDataExtractor();
 //	BinaryFilter filter = new BinaryFilter(); 
 //	HistogramEFilter filter = new HistogramEFilter();
-	GayEFilter filter = new GayEFilter();
+//	GayEFilter filter = new GayEFilter();
+	ZoomFilter filter = new ZoomFilter(ZoomFilter.PIXEL_TIMES_ZOOM);
 	public void process(){
+		filter.setTimes(2);
 		this.destImage = filter.filter(sourceImage, null);
 		////
 //		this.destImage = extractor.filter(sourceImage, null);
