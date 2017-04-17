@@ -1,6 +1,7 @@
 package com.rpc.proxy;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 
 public class Invoker implements RpcInvocationHandler{
@@ -14,7 +15,8 @@ public class Invoker implements RpcInvocationHandler{
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		 System.out.println(protocol.getName());  
-		 System.out.println(method.getName());  
+		 System.out.println(method.getName());
+		 System.out.println(Arrays.toString(args));  
 		 
 		return null;
 	}
