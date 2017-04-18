@@ -11,7 +11,7 @@ public class DefautRpcProxyFatory implements RpcProxyFatory {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> RpcProxy<T> getProxy(Class<T> protocol, InetSocketAddress addr, SocketFactory factory) throws IOException {
-		Invoker invoker = new Invoker(protocol);
+		Invoker invoker = new Invoker(protocol,addr,factory);
 		T t = (T) Proxy.newProxyInstance(protocol.getClassLoader(), new Class[] { protocol }, invoker);
 		return new RpcProxy<T>(protocol, t);
 	}
