@@ -133,69 +133,119 @@ public class BinaryTree<K, V> {
 	}
 	/**
 	 * 删除
-	 * @Description: TODO 这个还是有点问题，到时候在看看
+	 * 只用递归的方式
+	 * 如果不用递归方式会很复杂
+	 * @Description: TODO 
 	 * @author gbs
 	 * @param key
 	 */
-	public void delete(K key){
+	public void delete(K key) {
 		if (key == null) {
 			return;
 		}
-		Node<K, V> p = root;
-		Node<K, V> c = p;
 		@SuppressWarnings("unchecked")
 		Comparable<? super K> k = (Comparable<? super K>) key;
-		int result;
-		int presult = 0;
-		boolean b = true;
-		while (c != null) {
-			result = k.compareTo(c.getK());
-			if (result < 0) {
-				presult = result;
-				p = c;
-				c = p.left;
-			} else if (result > 0) {
-				presult = result;
-				p = c;
-				c = p.right;
-			} else {
-				b = false;
-				break;
-			}
-		}
-		
-		if (b) {
-			return;
-		}
-		
-		if (c.left == null) {
-			c = c.right;
-		} else if (c.right == null) {
-			c = c.left;
-		} else {
-			Node<K, V> findMinp = c;
-			Node<K, V> findMinc = findMinp.right;
-			if (findMinc.left == null) {
-				findMinp.right = null;
-			} else {
-				while (findMinc.left != null) {
-					findMinp = findMinc;
-					findMinc = findMinp.left;
-				}
-				findMinp.left = null;
-			}
-			c.k = findMinc.k;
-			c.v = findMinc.v;
-		}
-
-		if (presult < 0) {
-			p.left = c;
-		} else if (presult > 0) {
-			p.right = c;
-		}else{
-//			root = null;
-		}
+		root=remove(k, root, root);
 	}
+	//性能还可以改进，到时候在看看
+	private Node<K, V> remove(Comparable<? super K> k, Node<K, V> c, Node<K, V> p) {
+		int result = k.compareTo(c.getK());
+		if (result < 0) {
+			c.left = remove(k, c.left, c);
+		} else if (result > 0) {
+			c.right = remove(k, c.right, c);
+		} else {
+			if (c.left == null) {
+				if (c.right == null) {
+					return null;
+				}
+				c.right.parent = p;
+				return c.right;
+			} else if (c.right == null) {
+				if (c.left == null) {
+					return null;
+				}
+				c.left.parent = p;
+				return c.left;
+			} else {
+				Node<K, V> findMin = findMin(c.right);
+				//找到右子树最小的节点，递归去删除
+				Comparable<? super K> minK = (Comparable<? super K>) findMin.getK();
+				findMin.right = remove(minK, c.right, c);
+				findMin.left = c.left;
+				findMin.parent = p;
+				return findMin;
+			}
+		}
+		return c;
+	}
+	
+	/**
+	 * 非递归删除，还没有完善，等以后有时间来看看
+	 * @Description: TODO
+	 * @author gbs
+	 * @return
+	 */
+//	public void delete(K key){
+//		if (key == null) {
+//			return;
+//		}
+//		Node<K, V> p = root;
+//		Node<K, V> c = p;
+//		@SuppressWarnings("unchecked")
+//		Comparable<? super K> k = (Comparable<? super K>) key;
+//		int result;
+//		int presult = 0;
+//		boolean b = true;
+//		while (c != null) {
+//			result = k.compareTo(c.getK());
+//			if (result < 0) {
+//				presult = result;
+//				p = c;
+//				c = p.left;
+//			} else if (result > 0) {
+//				presult = result;
+//				p = c;
+//				c = p.right;
+//			} else {
+//				b = false;
+//				break;
+//			}
+//		}
+//		
+//		if (b) {
+//			return;
+//		}
+//		
+//		if (c.left == null) {
+//			c = c.right;
+//		} else if (c.right == null) {
+//			c = c.left;
+//		} else {
+//			Node<K, V> findMinp = c;
+//			Node<K, V> findMinc = findMinp.right;
+//			if (findMinc.left == null) {
+//				findMinp.right = null;
+//			} else {
+//				while (findMinc.left != null) {
+//					findMinp = findMinc;
+//					findMinc = findMinp.left;
+//				}
+//				findMinp.left = null;
+//			}
+//			c.k = findMinc.k;
+//			c.v = findMinc.v;
+//		}
+//
+//		if (presult < 0) {
+//			p.left = c;
+//		} else if (presult > 0) {
+//			p.right = c;
+//		}else{
+////			root = null;
+//		}
+//	}
+	
 	
 	public V getKeyMax() {
 		if (root == null) {
@@ -294,16 +344,17 @@ public class BinaryTree<K, V> {
 		BinaryTree<Integer, String> tree = new BinaryTree<Integer, String>();
 		tree.insert(4, "4");
 		tree.insert(3, "3");
-//		tree.insert(8, "8");
-//		tree.insert(1, "1");
-//		tree.insert(2, "d");
-//		tree.insert(7, "d");
-//		tree.insert(16, "16");
-//		tree.insert(10, "d");
-//		tree.insert(9, "d");
-//		tree.insert(14, "d");
+		tree.insert(8, "8");
+		tree.insert(1, "1");
+		tree.insert(2, "d");
+		tree.insert(7, "d");
+		tree.insert(16, "16");
+		tree.insert(20, "20");
+		tree.insert(10, "d");
+		tree.insert(14, "d");
+		tree.insert(9, "d");
 		
-		tree.delete(4);
+		tree.delete(8);
 		
 		
 		tree.show(2);
