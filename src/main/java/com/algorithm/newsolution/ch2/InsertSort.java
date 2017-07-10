@@ -25,13 +25,51 @@ public class InsertSort {
 			a[j + 1] = tmp;
 		}
 	}
-
+	
+	/**
+	 * 改进插入排序，利用二分查找，比较次数变成了o(logn)，插入还是O(n*n)
+	 * @Description: TODO
+	 * @author gbs
+	 * @param a
+	 */
+	public void sort2(int[] a) {
+		int n = a.length;
+		int tmp;
+		for (int i = 1; i < n; i++) {
+			tmp = a[i];
+			int p = binary_search(a, i, tmp);
+			for (int j = i; j > p; j--) {
+				a[j] = a[j-1];
+			}
+			a[p] = tmp;
+			show(a);
+		}
+	}
+	
+	private int binary_search(int a[],int len,int tmp){
+		int l = 0;
+		int u = len;
+		while (l < u) {
+			int m = (l + u) / 2;
+			if (a[m] == tmp) {
+				return m;
+			} else if (a[m] < tmp) {
+				l = m + 1;
+			} else {
+				u = m;
+			}
+		}
+		return l;
+	}
+	
 	public void show(int[] a) {
 		for (int i = 0; i < a.length; i++) {
 			System.out.print(a[i] + " ");
 		}
 		System.out.println();
 	}
+	
+	
 
 	public static void main(String[] args) {
 		InsertSort sort = new InsertSort();
@@ -42,7 +80,9 @@ public class InsertSort {
 			a[i] = r.nextInt(100);
 		}
 		sort.show(a);
-		sort.sort1(a);
+		System.out.println("------------------start------------------");
+		sort.sort2(a);
+		System.out.println("------------------end------------------");
 		sort.show(a);
 	}
 }
