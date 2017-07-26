@@ -9,6 +9,8 @@ import java.net.Socket;
 
 import javax.net.SocketFactory;
 
+import com.rpc.message.ClassMsgCoder;
+
 public class Invoker implements RpcInvocationHandler {
 
 	private final Class<?> protocol;
@@ -24,6 +26,9 @@ public class Invoker implements RpcInvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+		
+		ClassMsgCoder classMsgCoder = new ClassMsgCoder(method,args);
+		
 		// System.out.println(protocol.getName());
 		// System.out.println(method.getName());
 		// System.out.println(Arrays.toString(args));
