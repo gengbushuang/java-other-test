@@ -40,7 +40,7 @@ public class JmxTest {
 			System.out.println("pid:" + vmd.id() + ":" + vmd.displayName());
 		}
 
-		String pid = "722";
+		String pid = "5200";
 		VirtualMachine virtualmachine = VirtualMachine.attach(pid);
 		String javaHome = virtualmachine.getSystemProperties().getProperty("java.home");
 		System.out.println("javaHome-->" + javaHome);

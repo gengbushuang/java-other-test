@@ -1,6 +1,8 @@
 package com.rpc;
 
 import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,6 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import com.rpc.message.ClassMsgCoder;
+import com.rpc.message.ObjectMsgCoder;
 
 public class Provider {
 
@@ -23,12 +26,13 @@ public class Provider {
 			classMsgCoder.readFields(dis);
 			System.out.println(classMsgCoder);
 			//////////////////////////////////
-			Class serviceinterfaceclass = Class.forName(classMsgCoder.getDeclaringClassProtocolName());
+			Class<?> serviceinterfaceclass = Class.forName(classMsgCoder.getDeclaringClassProtocolName());
 			Object service = new SayHelloServiceImpl();
 			Method method = serviceinterfaceclass.getMethod(classMsgCoder.getMethodName(), classMsgCoder.getParameterClasses());
 			Object result = method.invoke(service, classMsgCoder.getParameters());
-			ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-			output.writeObject(result);
+			
+			ObjectMsgCoder.writeObject(new DataOutputStream(socket.getOutputStream()), result, result.getClass());
+			
 		}
 	}
 }

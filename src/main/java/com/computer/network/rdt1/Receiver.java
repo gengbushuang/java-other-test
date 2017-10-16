@@ -15,6 +15,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+
 /**
  * rtd1.0 完全可靠信道的可靠数据传输 接收数据方
  * 
@@ -39,6 +41,8 @@ public class Receiver implements Runnable {
 	// 从分组中取出数据(经由extract(packet,data)动作)，
 	// 并将数据上传给较高层(通过deliver_data(data)动作)
 	public void rtd_rcv(Packet packet) {
+		System.out.println("服务端接收:");
+		System.out.println(packet);
 		// extract(packet,data)
 		String data = extract(packet);
 		deliver_data(data);
@@ -61,7 +65,10 @@ public class Receiver implements Runnable {
 	private boolean tcpNoDelay;
 
 	private ByteBuffer buffer = ByteBuffer.allocateDirect(1024);
-
+	
+	private ByteBuffer buf = ByteBuffer.allocateDirect(1024);
+	
+	private ObjectInputStream ois;
 	public boolean isTcpNoDelay() {
 		return tcpNoDelay;
 	}
@@ -73,7 +80,6 @@ public class Receiver implements Runnable {
 	@Override
 	public void run() {
 		selectorthread = Thread.currentThread();
-
 		try {
 			server = ServerSocketChannel.open();
 			server.configureBlocking(false);
@@ -123,37 +129,29 @@ public class Receiver implements Runnable {
 						SocketChannel sc = (SocketChannel) key.channel();
 						buffer.clear();
 						long bytesRead = sc.read(buffer);
-						byte[] b;
-						int position = 0;
-						int limit = 0;
-						int count = 0;
+						byte [] bytes;
 						while (bytesRead > 0) {
 							buffer.flip();
-							position = buffer.position();
-							System.out.println("1 position -->" + position);
 							while (buffer.hasRemaining()) {
 								byte c = buffer.get();
 								if (c == '\n') {
-									limit = buffer.position();
-									count = limit - position;
-									System.out.println("position-->" + position + "(" + count + ")limit->" + limit);
-									position = limit;
+									buf.flip();
+									int limit = buf.limit();
+									bytes = new byte[limit];
+									buf.get(bytes);
+									ois = new ObjectInputStream(new ByteInputStream(bytes,bytes.length));
+									try {
+										Packet packet = (Packet) ois.readObject();
+										rtd_rcv(packet);
+									} catch (ClassNotFoundException e) {
+										e.printStackTrace();
+									}
+									buf.clear();
+								}else{
+									buf.put(c);
 								}
 							}
-							System.out.println("2 position -->" + buffer.position());
-							if (position == buffer.position()) {
-								buffer.clear();
-							} else {
-								buffer.position(position);
-							}
-
-							// if(limit < buffer.position()-1){
-							// buffer.position(position);
-							// }else{
-							// buffer.clear();
-							// limit=0;
-							// count=0;
-							// }
+							buffer.clear();
 							bytesRead = sc.read(buffer);
 						}
 						if (bytesRead < 0) {

@@ -1,5 +1,6 @@
 package com.rpc.proxy;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,6 +13,7 @@ import java.net.Socket;
 import javax.net.SocketFactory;
 
 import com.rpc.message.ClassMsgCoder;
+import com.rpc.message.ObjectMsgCoder;
 
 public class Invoker implements RpcInvocationHandler {
 
@@ -34,10 +36,10 @@ public class Invoker implements RpcInvocationHandler {
 		OutputStream outputStream = socket.getOutputStream();
 		classMsgCoder.write(new DataOutputStream(outputStream));
 
-		ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-		Object result = input.readObject();
+		DataInputStream dis = new DataInputStream(socket.getInputStream());
+		Object readObject = ObjectMsgCoder.readObject(dis);
 
-		return result;
+		return readObject;
 	}
 
 }

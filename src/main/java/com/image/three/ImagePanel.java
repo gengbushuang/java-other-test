@@ -55,9 +55,9 @@ public class ImagePanel extends JPanel {
 //	BinaryFilter filter = new BinaryFilter(); 
 //	HistogramEFilter filter = new HistogramEFilter();
 //	GayEFilter filter = new GayEFilter();
-	ZoomFilter filter = new ZoomFilter(ZoomFilter.PIXEL_TIMES_ZOOM);
+	ZoomFilter filter = new ZoomFilter(ZoomFilter.K_TIMES_ZOOM);
 	public void process(){
-		filter.setTimes(2);
+		filter.setTimes(3);
 		this.destImage = filter.filter(sourceImage, null);
 		////
 //		this.destImage = extractor.filter(sourceImage, null);

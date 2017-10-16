@@ -74,5 +74,11 @@
 			<version>9.4.0.RC1</version>
 			<scope>test</scope>
 		</dependency>
+		<!--antlr4 -->
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4</artifactId>
+			<version>4.7</version>
+		</dependency>
 	</dependencies>
 </project>

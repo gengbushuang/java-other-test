@@ -8,19 +8,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ObjectMsgCoder implements MsgCoder {
-	private Class parameterClasses;
+	private Class<?> parameterClasses;
 	private Object parameters;
 
 	public ObjectMsgCoder() {
 
 	}
 
-	public ObjectMsgCoder(Class declaredClass, Object instance) {
+	public ObjectMsgCoder(Class<?> declaredClass, Object instance) {
 		this.parameterClasses = declaredClass;
 		this.parameters = instance;
 	}
 
-	public Class getParameterClasses() {
+	public void set(Object instance){
+		this.parameters = instance;
+		this.parameterClasses = instance.getClass();
+	}
+	
+	public Class<?> getParameterClasses() {
 		return parameterClasses;
 	}
 
@@ -46,7 +51,8 @@ public class ObjectMsgCoder implements MsgCoder {
 		writeObject(out, parameters, parameterClasses);
 	}
 
-	public static void writeObject(DataOutput out, Object instance, Class declaredClass) throws IOException {
+	@SuppressWarnings("rawtypes")
+	public static void writeObject(DataOutput out, Object instance, Class<?> declaredClass) throws IOException {
 		if (instance == null) {
 
 		}
@@ -100,6 +106,7 @@ public class ObjectMsgCoder implements MsgCoder {
 		return readObject(in, null);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Object readObject(DataInput in, ObjectMsgCoder objectMsgCoder) throws IOException {
 		String className = in.readUTF();
 		Class<?> declaredClass = PRIMITIVE_NAMES.get(className);

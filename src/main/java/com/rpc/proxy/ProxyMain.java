@@ -16,7 +16,7 @@ public class ProxyMain {
 		try {
 			 RpcProxy<SayHelloService> rpcProxy = proxyFatory.getProxy(SayHelloService.class, address, SocketFactory.getDefault());
 			 SayHelloService proxy = rpcProxy.getProxy();
-			 String sayHello = proxy.sayHello("高高挂");
+			 String sayHello = proxy.sayHello("hello");
 			 System.out.println("-->"+sayHello);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

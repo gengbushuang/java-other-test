@@ -15,9 +15,10 @@ import javax.imageio.ImageIO;
 public class ImageOtsuThresholder {
 
 	public BitSet avhash(BufferedImage image) throws ImageException {
-		BufferedImage bufferedImage = ImageUtils.resize(image, 50, 50);
+		BufferedImage bufferedImage = ImageUtils.resize(image, image.getWidth(), image.getHeight());
 		BufferedImage grayImage = ImageUtils.gray(bufferedImage, ImageGray.WEIGHTED);
 		int threshold = otsuThresholder(grayImage);
+		System.out.println(threshold);
 		int width = grayImage.getWidth();
 		int height = grayImage.getHeight();
 		BitSet bitSet = new BitSet(width * height);
@@ -27,15 +28,22 @@ public class ImageOtsuThresholder {
 				int h = 0xFF & rgb;
 				int index = y*width+x;
 				if (h >= threshold) {
+					bufferedImage.setRGB(x, y, (255<<24)|(255<<16)|(255<<8)|255);
 //					System.out.print(1+" ");
 					bitSet.set(index,true);
 				} else {
+					bufferedImage.setRGB(x, y, (255<<24)|(0<<16)|(0<<8)|0);
 //					System.out.print(0+" ");
 					bitSet.set(index,false);
 				}
 
 			}
 //			System.out.println();
+		}
+		try {
+			ImageIO.write(bufferedImage, "jpg", new File("F:/tmp/mmmm.JPG"));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return bitSet;
 	}
@@ -100,20 +108,20 @@ public class ImageOtsuThresholder {
 
 	public static void main(String[] args) throws IOException, ImageException {
 		ImageOtsuThresholder otsuThresholder = new ImageOtsuThresholder();
-		BufferedImage bufferedImage = ImageIO.read(new File("F:/tmp/IMG_1179.JPG"));
+		BufferedImage bufferedImage = ImageIO.read(new File("F:/tmp/IMG_1182.JPG"));
 		BitSet bitSet = otsuThresholder.avhash(bufferedImage);
-		BufferedImage bufferedImage2 = ImageIO.read(new File("F:/tmp/IMG_1182.JPG"));
-		BitSet bitSet2 = otsuThresholder.avhash(bufferedImage2);
-		
-		bitSet.xor(bitSet2);
-		
-		int count = 0;
-		for(int i =0;i<bitSet.size();i++){
-			if(bitSet.get(i)){
-				count++;
-			}
-		}
-		System.out.println(count);
+//		BufferedImage bufferedImage2 = ImageIO.read(new File("F:/tmp/IMG_1182.JPG"));
+//		BitSet bitSet2 = otsuThresholder.avhash(bufferedImage2);
+//		
+//		bitSet.xor(bitSet2);
+//		
+//		int count = 0;
+//		for(int i =0;i<bitSet.size();i++){
+//			if(bitSet.get(i)){
+//				count++;
+//			}
+//		}
+//		System.out.println(count);
 		
 	}
 }

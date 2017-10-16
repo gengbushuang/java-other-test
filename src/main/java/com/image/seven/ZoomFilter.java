@@ -45,21 +45,16 @@ public class ZoomFilter extends AbstractBufferedImageOp {
 		int[] inPixels = new int[width * height];
 		getRGB(src, 0, 0, width, height, inPixels);
 		if (zoomType == ZERO_TIMES_ZOOM) {
-			dest = zeroZoom(inPixels, width, height,src,dest);
+			dest = zeroZoom(inPixels, width, height, src, dest);
 		} else if (zoomType == K_TIMES_ZOOM) {
-			kZoom(inPixels, width, height,dest);
+			kZoom(inPixels, width, height, dest);
 		} else {
-			dest = pixelZoom(inPixels, width, height,src,dest);
+			dest = pixelZoom(inPixels, width, height, src, dest);
 		}
-		// if (dest == null) {
-		// dest = createCompatibleDestImage(src, nwidth,nheight,null);
-		// }
-		//
-		// setRGB(dest, 0, 0, nwidth, nheight, outPixels);
 		return dest;
 	}
 
-	private BufferedImage zeroZoom(int[] inPixels, int width, int height,BufferedImage src,BufferedImage dest) {
+	private BufferedImage zeroZoom(int[] inPixels, int width, int height, BufferedImage src, BufferedImage dest) {
 		int nwidth = width + width - 1;
 		int nheight = height + height - 1;
 		int[] outPixels = new int[nwidth * nheight];
@@ -78,55 +73,107 @@ public class ZoomFilter extends AbstractBufferedImageOp {
 					outPixels[nindex] = inPixels[oindex1];
 				} else {
 					int oindex2 = tmprow * width + (tmpcol + 1);
-					sawpPixels(outPixels,nindex,inPixels,oindex1,oindex2);
+					sawpPixels(outPixels, nindex, inPixels, oindex1, oindex2);
 				}
 			}
 		}
-		
-		
+
 		for (int row = 0; row < nheight; row++) {
 			if (row % 2 == 0) {
 				continue;
 			}
 			for (int col = 0; col < nwidth; col++) {
 				nindex = row * nwidth + col;
-				int oindex1 = (row-1) * nwidth + col;
+				int oindex1 = (row - 1) * nwidth + col;
 				int oindex2 = (row + 1) * nwidth + col;
 				sawpPixels(outPixels, nindex, outPixels, oindex1, oindex2);
 			}
 		}
-		
-		if(dest==null){
-			dest = createCompatibleDestImage(src,nwidth,nheight,null);
+
+		if (dest == null) {
+			dest = createCompatibleDestImage(src, nwidth, nheight, null);
 		}
 		setRGB(dest, 0, 0, nwidth, nheight, outPixels);
 		return dest;
 	}
-	
+
 	private void sawpPixels(int[] outPixels, int nindex, int[] inPixels, int oindex1, int oindex2) {
 		int ta1 = (inPixels[oindex1] >> 24) & 0xff;
 		int tr1 = (inPixels[oindex1] >> 16) & 0xff;
 		int tg1 = (inPixels[oindex1] >> 8) & 0xff;
 		int tb1 = inPixels[oindex1] & 0xff;
-		
-//		int ta2 = (inPixels[oindex2] >> 24) & 0xff;
+
+		// int ta2 = (inPixels[oindex2] >> 24) & 0xff;
 		int tr2 = (inPixels[oindex2] >> 16) & 0xff;
 		int tg2 = (inPixels[oindex2] >> 8) & 0xff;
 		int tb2 = inPixels[oindex2] & 0xff;
-		
-		int tr3 = (tr1+tr2)/2;
-		int tg3 = (tg1+tg2)/2;
-		int tb3 = (tb1+tb2)/2;
-		
+
+		int tr3 = (tr1 + tr2) / 2;
+		int tg3 = (tg1 + tg2) / 2;
+		int tb3 = (tb1 + tb2) / 2;
+
 		outPixels[nindex] = (ta1 << 24) | (tr3 << 16) | (tg3 << 8) | tb3;
 	}
 
-
-	private void kZoom(int[] inPixels, int width, int height,BufferedImage dest) {
+	private void kZoom(int[] inPixels, int width, int height, BufferedImage dest) {
+		System.out.println(width + "X" + height);
+		int k = times;
+		int dw = k * (width - 1) + 1;
+		int dh = k * (height - 1) + 1;
+		System.out.println(dw + "X" + dh);
+		int[] outPixels = new int[dw * dh];
+		int index = 0;
+		int nindex = 0;
+		for (int row = 0; row < height; row++) {
+			for (int col = 0; col < width; col++) {
+				index = row * width + col;
+				if (col != 0) {
+					int ta1 = (inPixels[index-1] >> 24) & 0xff;
+					int tr1 = (inPixels[index-1] >> 16) & 0xff;
+					int tg1 = (inPixels[index-1] >> 8) & 0xff;
+					int tb1 = inPixels[index-1] & 0xff;
+					
+					int tr2 = (inPixels[index] >> 16) & 0xff;
+					int tg2 = (inPixels[index] >> 8) & 0xff;
+					int tb2 = inPixels[index] & 0xff;
+					
+					int optr = Math.abs(tr1-tr2)/k;
+					int optg = Math.abs(tg1-tg2)/k;
+					int optb = Math.abs(tb1-tb2)/k;
+					
+					int tmptr = Math.min(tr1, tr2);
+					int tmptg = Math.min(tg1, tg2);
+					int tmptb = Math.min(tb1, tb2);
+					
+					for(int i = 1;i<k;i++){
+						nindex+=1;
+						tmptr+=optr;
+						tmptg+=optg;
+						tmptb+=optb;
+						outPixels[nindex]=(ta1 << 24) | (tmptr << 16) | (tmptg << 8) | tmptb;
+					}
+					nindex+=1;
+					outPixels[nindex] = inPixels[index];
+				} else {
+					if (nindex != 0) {
+						nindex += dw * (k - 1);
+					}
+					outPixels[nindex] = inPixels[index];
+				}
+			}
+		}
 		
+		for (int row = 0; row < dh; row++) {
+			for (int col = 0; col < dw; col++) {
+				index = row * dw + col;
+				System.out.print(outPixels[index]+" ");
+			}
+			System.out.println();
+		}
+
 	}
 
-	private BufferedImage pixelZoom(int[] inPixels, int width, int height,BufferedImage src,BufferedImage dest) {
+	private BufferedImage pixelZoom(int[] inPixels, int width, int height, BufferedImage src, BufferedImage dest) {
 		int nwidth = width * times;
 		int nheight = height * times;
 		int[] outPixels = new int[nwidth * nheight];
@@ -140,8 +187,8 @@ public class ZoomFilter extends AbstractBufferedImageOp {
 				outPixels[index] = inPixels[index2];
 			}
 		}
-		if(dest==null){
-			dest = createCompatibleDestImage(src,nwidth,nheight,null);
+		if (dest == null) {
+			dest = createCompatibleDestImage(src, nwidth, nheight, null);
 		}
 		setRGB(dest, 0, 0, nwidth, nheight, outPixels);
 		return dest;

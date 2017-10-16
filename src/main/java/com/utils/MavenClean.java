@@ -51,7 +51,7 @@ public class MavenClean {
 	}
 	
 	public static void main(String[] args) {
-		String filePath = "/Users/gbs/software/apache-maven-3.3.1/conf/repo/";
+		String filePath = "D:\\maven\\repo";
 		new MavenClean().clean(filePath);
 	}
 }

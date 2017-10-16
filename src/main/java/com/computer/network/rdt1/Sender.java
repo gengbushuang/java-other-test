@@ -88,6 +88,18 @@ public class Sender implements Runnable {
 		outputStream.writeChar('\n');
 		outputStream.flush();
 	}
+	
+	public void close() throws IOException{
+		if(ostream!=null){
+			ostream.close();
+		}
+		if(istream!=null){
+			istream.close();
+		}
+		if(socket!=null){
+			socket.close();
+		}
+	}
 
 	@Override
 	public void run() {
