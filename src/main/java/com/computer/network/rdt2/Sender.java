@@ -1,8 +1,10 @@
 package com.computer.network.rdt2;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
@@ -39,7 +41,8 @@ public class Sender implements Runnable {
 			System.out.println("客户端发送:");
 			show(sndpkt);
 			udt_send(sndpkt);
-			rcvpkt = (Packet) istream.readObject();
+			ObjectInputStream ois = new ObjectInputStream(istream);
+			rcvpkt = (Packet) ois.readObject();
 			System.out.println("客户端接收:");
 			show(rcvpkt);
 		} while (rdt_rcv(rcvpkt) && isNAK(rcvpkt));
@@ -54,8 +57,10 @@ public class Sender implements Runnable {
 	}
 
 	public void udt_send(Packet packet) throws IOException {
-		ostream.writeObject(packet);
-		ostream.flush();
+		ObjectOutputStream oos = new ObjectOutputStream(ostream);
+		oos.writeObject(packet);
+		oos.writeChar('\n');
+		oos.flush();
 	}
 
 	public boolean rdt_rcv(Packet rcvpkt) {
@@ -74,17 +79,29 @@ public class Sender implements Runnable {
 		System.out.println(rcvpkt);
 	}
 
+	public void close() throws IOException {
+		if (ostream != null) {
+			ostream.close();
+		}
+		if (istream != null) {
+			istream.close();
+		}
+		if (socket != null) {
+			socket.close();
+		}
+	}
+
 	protected URI uri = null;
 
 	private Socket socket = null;
 
-	// private InputStream istream;
+	private InputStream istream;
+
+	private OutputStream ostream;
+
+	// private ObjectInputStream istream;
 	//
-	// private OutputStream ostream;
-
-	private ObjectInputStream istream;
-
-	private ObjectOutputStream ostream;
+	// private ObjectOutputStream ostream;
 
 	private Proxy proxy = Proxy.NO_PROXY;
 
@@ -131,10 +148,10 @@ public class Sender implements Runnable {
 			if (!socket.isBound()) {
 				socket.connect(new InetSocketAddress(uri.getHost(), getPort()), connectTimeout);
 			}
-			// istream = socket.getInputStream();
-			// ostream = socket.getOutputStream();
-			ostream = new ObjectOutputStream(socket.getOutputStream());
-			istream = new ObjectInputStream(socket.getInputStream());
+			istream = socket.getInputStream();
+			ostream = socket.getOutputStream();
+			// ostream = new ObjectOutputStream(socket.getOutputStream());
+			// istream = new ObjectInputStream(socket.getInputStream());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

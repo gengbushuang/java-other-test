@@ -1,6 +1,9 @@
 package com.computer.network.rdt2;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,6 +15,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
+
 public class Receiver implements Runnable {
 
 	private final static int NAK = 0;
@@ -21,9 +26,14 @@ public class Receiver implements Runnable {
 	private int check_sum(String data) {
 		return data.hashCode();
 	}
+	
+	public void rtd_rcv(Packet packet) {
+		
+	}
 
 	public void udt_send(Packet sndpkt) {
-
+		System.out.println("服务器端发送:");
+		show(sndpkt);
 	}
 
 	public String extract(Packet packet) {
@@ -39,7 +49,7 @@ public class Receiver implements Runnable {
 	}
 
 	// rdt2.0接收方只有一个状态
-	public void rdt_rcv(Packet rcvpkt) {
+	public Packet rdt_rcv(Packet rcvpkt) {
 		System.out.println("服务器端接收:");
 		show(rcvpkt);
 		Packet sndpkt;
@@ -51,9 +61,8 @@ public class Receiver implements Runnable {
 		} else {
 			sndpkt = make_pkt("NAK",NAK);
 		}
-		System.out.println("服务器端发送:");
-		show(sndpkt);
-		udt_send(sndpkt);
+		return sndpkt;
+		//udt_send(sndpkt);
 	}
 
 	public boolean corrupt(Packet rcvpkt) {
@@ -79,6 +88,8 @@ public class Receiver implements Runnable {
 	private boolean tcpNoDelay;
 
 	private ByteBuffer buffer = ByteBuffer.allocateDirect(1024);
+	
+	private ByteBuffer buf = ByteBuffer.allocateDirect(1024);
 
 	public Receiver(int port) {
 		this(new InetSocketAddress(port));
@@ -113,12 +124,13 @@ public class Receiver implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-
+		ObjectInputStream ois;
+		ObjectOutputStream oos;
+		byte [] bytes;
 		while (!selectorthread.isInterrupted()) {
 			SelectionKey key = null;
 			try {
 				int n = selector.select();
-				System.out.println("selector n-->" + n);
 				if (n == 0) {
 					continue;
 				}
@@ -128,10 +140,8 @@ public class Receiver implements Runnable {
 				while (i.hasNext()) {
 					key = i.next();
 					i.remove();
-					System.out.println("key-->" + key);
 					//
 					if (key.isAcceptable()) {
-						System.out.println("Acceptable-->start");
 						SocketChannel channel = server.accept();
 						if (channel == null) {
 							continue;
@@ -142,33 +152,53 @@ public class Receiver implements Runnable {
 						socket.setKeepAlive(true);
 						channel.register(selector, SelectionKey.OP_READ);
 						// selector.wakeup();
-						System.out.println("Acceptable-->end");
 						continue;
 					}
 
 					if (key.isReadable()) {
-						System.out.println("Readable-->start");
 						SocketChannel sc = (SocketChannel) key.channel();
 						buffer.clear();
 						long bytesRead = sc.read(buffer);
 						while (bytesRead > 0) {
 							buffer.flip();
 							while (buffer.hasRemaining()) {
-								System.out.print((char) buffer.get());
+								byte c = buffer.get();
+								if (c == '\n') {
+									buf.flip();
+									int limit = buf.limit();
+									bytes = new byte[limit];
+									buf.get(bytes);
+									ois = new ObjectInputStream(new ByteInputStream(bytes,bytes.length));
+									try {
+										Packet packet = (Packet) ois.readObject();
+										Packet sndpkt = rdt_rcv(packet);
+										udt_send(sndpkt);
+										ByteArrayOutputStream bao = new ByteArrayOutputStream();
+										oos = new ObjectOutputStream(bao);
+										oos.writeObject(sndpkt);
+										ByteBuffer wrap = ByteBuffer.wrap(bao.toByteArray());
+//										buf.clear();
+//										buf.flip();
+//										buf.put(bao.toByteArray());
+										sc.write(wrap);
+									} catch (ClassNotFoundException e) {
+										e.printStackTrace();
+									}
+									buf.clear();
+								}else{
+									buf.put(c);
+								}
 							}
-							System.out.println();
 							buffer.clear();
 							bytesRead = sc.read(buffer);
 						}
 						if (bytesRead < 0) {
 							sc.close();
 						}
-						System.out.println("Readable-->end");
 						continue;
 					}
 
 					if (key.isWritable()) {
-						System.out.println("Writable-->");
 						continue;
 					}
 				}
