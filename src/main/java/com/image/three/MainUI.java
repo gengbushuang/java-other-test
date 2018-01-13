@@ -18,10 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.commons.math3.exception.NullArgumentException;
-
-import com.image.four.BrightContrastSatUI;
-
 public class MainUI extends JFrame implements ActionListener{
 
 	public static final String IMAGE_CMD = "选择图像...";
