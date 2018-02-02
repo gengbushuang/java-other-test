@@ -22,7 +22,7 @@ public class ServerState {
     public void setVotedFor(int votedFor) {
         this.votedFor = votedFor;
     }
-
+    
     public void increaseTerm(){
         this.term += 1;
     }

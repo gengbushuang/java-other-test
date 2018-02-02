@@ -38,4 +38,13 @@ public class ClusterConfiguration {
 		this.servers = servers;
 	}
 	
+	public ClusterServer getServer(int id) {
+		for (ClusterServer server : this.servers) {
+			if (server.getId() == id) {
+				return server;
+			}
+		}
+		return null;
+	}
+	
 }
