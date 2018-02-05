@@ -1,4 +1,4 @@
-package com.raft.server;
+package com.raft;
 public class ServerState {
 	//服务器最后一次任期号
     private long term;

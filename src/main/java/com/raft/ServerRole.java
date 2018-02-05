@@ -1,4 +1,4 @@
-package com.raft.server;
+package com.raft;
 
 /**
  * 状态机制
