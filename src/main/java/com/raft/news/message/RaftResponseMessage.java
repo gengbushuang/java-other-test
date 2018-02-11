@@ -19,4 +19,10 @@ public class RaftResponseMessage extends RaftMessage {
 	public void setAccepted(boolean accepted) {
 		this.accepted = accepted;
 	}
+
+	@Override
+	public String toString() {
+		return "RaftResponseMessage [nextIndex=" + nextIndex + ", accepted=" + accepted + "]";
+	}
+
 }

@@ -1,5 +1,7 @@
 package com.raft.news.message;
 
+import java.util.Arrays;
+
 public class LogEntry {
 
 	private byte[] value;
@@ -25,5 +27,10 @@ public class LogEntry {
 
 	public long getTerm() {
 		return term;
+	}
+
+	@Override
+	public String toString() {
+		return "LogEntry [value=" + Arrays.toString(value) + ", term=" + term + "]";
 	}
 }

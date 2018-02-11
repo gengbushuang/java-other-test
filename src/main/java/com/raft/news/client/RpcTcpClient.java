@@ -3,7 +3,6 @@ package com.raft.news.client;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousByteChannel;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -17,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.raft.news.message.RaftRequestMessage;
 import com.raft.news.message.RaftResponseMessage;
+import com.raft.news.util.AsyncUtility;
 import com.raft.news.util.BinaryUtils;
 
 public class RpcTcpClient {
@@ -111,36 +111,8 @@ public class RpcTcpClient {
 			}
 		};
 
-		writeToChannel(this.connection, buffer, task, handler);
+		AsyncUtility.writeToChannel(this.connection, buffer, task, handler);
 
-	}
-
-	private void writeToChannel(AsynchronousByteChannel channel, ByteBuffer buffer, AsyncTask<RaftRequestMessage> attachment,
-			CompletionHandler<Integer, AsyncTask<RaftRequestMessage>> completionHandler) {
-
-		CompletionHandler<Integer, AsyncContext<AsyncTask<RaftRequestMessage>>> h2 = new CompletionHandler<Integer, RpcTcpClient.AsyncContext<AsyncTask<RaftRequestMessage>>>() {
-
-			@Override
-			public void failed(Throwable error, AsyncContext<AsyncTask<RaftRequestMessage>> a) {
-				a.completionHandler.failed(error, a.attachment);
-			}
-
-			@Override
-			public void completed(Integer result, AsyncContext<AsyncTask<RaftRequestMessage>> a) {
-				int bytesRead = result.intValue();
-				if (bytesRead == -1 || !buffer.hasRemaining()) {
-					a.completionHandler.completed(buffer.position(), a.attachment);
-				} else {
-					writeToChannel(channel, buffer, attachment, completionHandler);
-				}
-			}
-		};
-
-		try {
-			channel.write(buffer, new AsyncContext<AsyncTask<RaftRequestMessage>>(attachment, completionHandler), h2);
-		} catch (Throwable exception) {
-			completionHandler.failed(exception, attachment);
-		}
 	}
 
 	// ////////////
@@ -186,38 +158,11 @@ public class RpcTcpClient {
 
 		try {
 			this.logger.debug("reading response from socket...");
-			readFromChannel(this.connection, task.input, task, handler);
+			AsyncUtility.readFromChannel(this.connection, task.input, task, handler);
 		} catch (Exception readError) {
 			logger.info("failed to read from socket", readError);
 			task.future.completeExceptionally(readError);
 			closeSocket();
-		}
-	}
-
-	public static void readFromChannel(AsynchronousByteChannel channel, ByteBuffer buffer, AsyncTask<ByteBuffer> attachment, CompletionHandler<Integer, AsyncTask<ByteBuffer>> completionHandler) {
-
-		CompletionHandler<Integer, AsyncContext<AsyncTask<ByteBuffer>>> handler = new CompletionHandler<Integer, RpcTcpClient.AsyncContext<AsyncTask<ByteBuffer>>>() {
-
-			@Override
-			public void failed(Throwable error, AsyncContext<AsyncTask<ByteBuffer>> a) {
-				a.completionHandler.failed(error, a.attachment);
-			}
-
-			@Override
-			public void completed(Integer result, AsyncContext<AsyncTask<ByteBuffer>> a) {
-				int bytesRead = result.intValue();
-				if (bytesRead == -1 || !buffer.hasRemaining()) {
-					a.completionHandler.completed(buffer.position(), a.attachment);
-				} else {
-					readFromChannel(channel, buffer, attachment, completionHandler);
-				}
-			}
-		};
-
-		try {
-			channel.read(buffer, new AsyncContext<AsyncTask<ByteBuffer>>(attachment, completionHandler), handler);
-		} catch (Throwable exception) {
-			completionHandler.failed(exception, attachment);
 		}
 	}
 
@@ -274,16 +219,6 @@ public class RpcTcpClient {
 		public AsyncTask(TInput input, CompletableFuture<RaftResponseMessage> future) {
 			this.input = input;
 			this.future = future;
-		}
-	}
-
-	private static class AsyncContext<A> {
-		private A attachment;
-		private CompletionHandler<Integer, A> completionHandler;
-
-		public AsyncContext(A attachment, CompletionHandler<Integer, A> handler) {
-			this.attachment = attachment;
-			this.completionHandler = handler;
 		}
 	}
 }

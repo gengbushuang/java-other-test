@@ -214,7 +214,7 @@ public class RpcTcpService {
 	}
 
 	private void processMessage(String message, CompletableFuture<String> future) {
-
+	     System.out.println("Got message " + message);
 	}
 
 	public void readFromChannel(AsynchronousByteChannel channel, ByteBuffer buffer, Object attachment, CompletionHandler<Integer, Object> completionHandler) {

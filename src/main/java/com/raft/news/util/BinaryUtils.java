@@ -51,7 +51,7 @@ public class BinaryUtils {
 	public static boolean byteToBoolean(byte value) {
 		return value != 0;
 	}
-	
+
 	// RaftRequestMessage转换成byte
 	public static byte[] messageToBytes(RaftRequestMessage request) {
 		LogEntry[] logEntries = request.getLogEntries();
@@ -92,6 +92,31 @@ public class BinaryUtils {
 		return requestBuffer.array();
 	}
 
+	// byte转换RaftRequestMessage对象
+	public static Pair<RaftRequestMessage, Integer> bytesToRequestMessage(byte[] data) {
+		if (data == null || data.length != RAFT_REQUEST_HEADER_SIZE) {
+			throw new IllegalArgumentException("invalid request message header.");
+		}
+		ByteBuffer buffer = ByteBuffer.wrap(data);
+		RaftRequestMessage requestMessage = new RaftRequestMessage();
+		// 1位
+		requestMessage.setMessageType(RaftMessageType.fromByte(buffer.get()));
+		// 4位
+		requestMessage.setSource(buffer.getInt());
+		// 4位
+		requestMessage.setDestination(buffer.getInt());
+		// 8位
+		requestMessage.setTerm(buffer.getLong());
+		// 8位
+		requestMessage.setLastLogTerm(buffer.getLong());
+		// 8位
+		requestMessage.setLastLogIndex(buffer.getLong());
+		// 8位
+		requestMessage.setCommitIndex(buffer.getLong());
+		int logDataSize = buffer.getInt();
+		return new Pair<RaftRequestMessage, Integer>(requestMessage, logDataSize);
+	}
+
 	// logEntry转换byte
 	public static byte[] logEntryToBytes(LogEntry logEntry) {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -107,6 +132,26 @@ public class BinaryUtils {
 		} catch (IOException exception) {
 			throw new RuntimeException("logEntry对象转换byte出现异常");
 		}
+	}
+
+	// byte转换LogEntry对象
+	public static LogEntry[] bytesToLogEntries(byte[] data) {
+		if (data == null || data.length < Long.BYTES) {
+			throw new IllegalArgumentException("invalid log entries data");
+		}
+		ByteBuffer buffer = ByteBuffer.wrap(data);
+		List<LogEntry> logEntries = new ArrayList<LogEntry>();
+		while (buffer.hasRemaining()) {
+			long term = buffer.getLong();
+			// byte valueType = buffer.get();
+			int valueSize = buffer.getInt();
+			byte[] value = new byte[valueSize];
+			if (valueSize > 0) {
+				buffer.get(value);
+			}
+			logEntries.add(new LogEntry(term, value));
+		}
+		return logEntries.toArray(new LogEntry[0]);
 	}
 
 	// RaftResponseMessage对象转换byte

@@ -1,5 +1,7 @@
 package com.raft.news.message;
 
+import java.util.Arrays;
+
 public class RaftRequestMessage extends RaftMessage {
 	// 最后日志任期记录
 	private long lastLogTerm;
@@ -39,4 +41,10 @@ public class RaftRequestMessage extends RaftMessage {
 	public void setLogEntries(LogEntry[] logEntries) {
 		this.logEntries = logEntries;
 	}
+
+	@Override
+	public String toString() {
+		return "RaftRequestMessage [lastLogTerm=" + lastLogTerm + ", lastLogIndex=" + lastLogIndex + ", commitIndex=" + commitIndex + ", logEntries=" + Arrays.toString(logEntries) + "]";
+	}
+	
 }
