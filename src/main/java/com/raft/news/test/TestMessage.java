@@ -38,8 +38,27 @@ public class TestMessage implements RaftMessageHandler {
 		return response;
 	}
 
-	private synchronized RaftResponseMessage handleVoteRequest(RaftRequestMessage request) {
-
+	private synchronized RaftResponseMessage handleAppendEntriesRequest(RaftRequestMessage request) {
+		RaftResponseMessage response = new RaftResponseMessage();
+		response.setMessageType(RaftMessageType.AppendEntriesResponse);
+		return response;
 	}
 
+	private synchronized RaftResponseMessage handleVoteRequest(RaftRequestMessage request) {
+		RaftResponseMessage response = new RaftResponseMessage();
+		response.setMessageType(RaftMessageType.RequestVoteResponse);
+		return response;
+	}
+
+	private RaftResponseMessage handleClientRequest(RaftRequestMessage request) {
+		RaftResponseMessage response = new RaftResponseMessage();
+		response.setMessageType(RaftMessageType.ClientRequest);
+		return response;
+	}
+
+	private synchronized RaftResponseMessage handleExtendedMessages(RaftRequestMessage request) {
+		RaftResponseMessage response = new RaftResponseMessage();
+		response.setMessageType(RaftMessageType.LeaveClusterResponse);
+		return response;
+	}
 }

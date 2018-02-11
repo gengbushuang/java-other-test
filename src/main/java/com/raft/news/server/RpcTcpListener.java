@@ -187,4 +187,29 @@ public class RpcTcpListener {
 			this.logger.info("failed to close client socket", ex);
 		}
 	}
+
+	public void stop() {
+		for (AsynchronousSocketChannel connection : this.connections) {
+			try {
+				connection.close();
+			} catch (IOException error) {
+				logger.info("failed to close connection, but it's fine", error);
+			}
+		}
+
+		if (this.listener != null) {
+			try {
+				this.listener.close();
+			} catch (IOException e) {
+				logger.info("failed to close the listener socket", e);
+			}
+
+			this.listener = null;
+		}
+
+		if (this.executorService != null) {
+			this.executorService.shutdown();
+			this.executorService = null;
+		}
+	}
 }
