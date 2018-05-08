@@ -45,9 +45,9 @@ public class UtilsDnf {
 	}
 	
 	public static void main(String[] args) {
-		String s = "sfsdf";
+		String s = "}";
 		
-		int t = UtilsDnf.skipSpace(s, 0);
+		int t = UtilsDnf.skipString(s, 0);
 		System.out.println(t);
 	}
 }

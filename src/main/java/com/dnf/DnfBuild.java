@@ -104,7 +104,8 @@ public class DnfBuild {
 			}
 			
 			i = UtilsDnf.skipSpace(dnf, i + 1);
-			if(dnf.charAt(i)=='\050'){ //判断)
+			System.out.println(dnf.charAt(i));
+			if(dnf.charAt(i)=='\051'){ //判断)
 				
 				int conjId = handler.add(conj);
 				
@@ -240,6 +241,7 @@ public class DnfBuild {
 		}
 
 		public int add(Amt amt) {
+			
 			return 0;
 		}
 
@@ -265,6 +267,6 @@ public class DnfBuild {
 	public static void main(String[] args) {
 		String s = "(age in {3} and state in {NY}) or (state in {CA} and gender in {M})";
 		DnfBuild build = new DnfBuild();
-		build.conjParse(s, 0);
+		build.AddDoc("test","1101",s);
 	}
 }
