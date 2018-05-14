@@ -1,6 +1,7 @@
 package com.dnf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +65,7 @@ public class DnfBuild {
 
 	public Patr<Integer, Integer> conjParse(String dnf, int i) {
 		String key, val;
-		List<String> vals = new ArrayList<>(2);
+		//List<String> vals = new ArrayList<>(2);
 		String op;
 		boolean bool = false;
 		Conj conj = new Conj(new ArrayList<Integer>());
@@ -102,7 +103,7 @@ public class DnfBuild {
 			// if (dnf.charAt(i) == '\173') {
 			//
 			// }
-
+			List<String> vals = new ArrayList<>(2);
 			while (true) {
 				i = UtilsDnf.skipSpace(dnf, i + 1);
 				patr = UtilsDnf.getString(dnf, i);
@@ -185,6 +186,32 @@ public class DnfBuild {
 	 *
 	 */
 	private class Conj {
+		
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Conj other = (Conj) obj;
+			if(this.size != other.size)
+				return false;
+			if(this.amtList.size() != other.amtList.size())
+				return false;
+			for(int i = 0;i<this.amtList.size();i++){
+				if(this.amtList.get(i)!=other.amtList.get(i)){
+					return false;
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "Conj [id=" + id + ", size=" + size + ", amtSorted=" + amtSorted + ", amts=" + Arrays.toString(amts) + ", amtList=" + amtList + "]";
+		}
+
 		private int id;
 		private int size;
 		private boolean amtSorted;
@@ -193,6 +220,10 @@ public class DnfBuild {
 
 		public Conj(List<Integer> amtList) {
 			this.amtList = amtList;
+		}
+
+		private DnfBuild getOuterType() {
+			return DnfBuild.this;
 		}
 	}
 
@@ -207,6 +238,39 @@ public class DnfBuild {
 	 *
 	 */
 	private class Amt {
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + id;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Amt other = (Amt) obj;
+			if(this.terms.size() != other.terms.size())
+				return false;
+			if(this.belong != other.belong)
+				return false;
+			for(int i = 0;i<terms.size();i++){
+				if(terms.get(i)!=other.terms.get(i)){
+					return false;
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "Amt [id=" + id + ", belong=" + belong + ", termSorted=" + termSorted + ", terms=" + terms + "]";
+		}
+
 		private int id;
 		private boolean belong;
 		private boolean termSorted;
@@ -216,9 +280,20 @@ public class DnfBuild {
 			this.terms = terms;
 			this.belong = belong;
 		}
+
+		private DnfBuild getOuterType() {
+			return DnfBuild.this;
+		}
+		
 	}
 
 	private class Term {
+
+		@Override
+		public String toString() {
+			return "Term [id=" + id + ", key=" + key + ", value=" + value + "]";
+		}
+
 		private int id;
 		private String key;
 		private String value;
@@ -227,9 +302,19 @@ public class DnfBuild {
 			this.key = key;
 			this.value = value;
 		}
+
+		private DnfBuild getOuterType() {
+			return DnfBuild.this;
+		}
+		
 	}
 
 	private class CPair implements Comparable<CPair> {
+		@Override
+		public String toString() {
+			return "CPair [conjId=" + conjId + ", bool=" + bool + "]";
+		}
+
 		private int conjId;
 		private boolean bool;
 
@@ -242,9 +327,15 @@ public class DnfBuild {
 		public int compareTo(CPair o) {
 			return conjId - o.conjId;
 		}
+		
 	}
 
 	private class TermRvs implements Comparable<TermRvs> {
+		@Override
+		public String toString() {
+			return "TermRvs [termId=" + termId + ", cList=" + cList + "]";
+		}
+
 		private int termId;
 		private List<CPair> cList;
 
@@ -257,7 +348,7 @@ public class DnfBuild {
 		public int compareTo(TermRvs o) {
 			return termId - o.termId;
 		}
-
+		
 	}
 
 	private class Handler {

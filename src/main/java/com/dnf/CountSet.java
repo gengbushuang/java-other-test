@@ -28,7 +28,7 @@ public class CountSet {
 		} else {
 			Integer val = positive.get(id);
 			if (val == null) {
-				val = new Integer(1);
+				val = new Integer(0);
 			}
 			val += 1;
 			if (val.intValue() >= this.count) {

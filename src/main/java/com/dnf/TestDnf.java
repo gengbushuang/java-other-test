@@ -1,11 +1,21 @@
 package com.dnf;
 
-public class TestDnf {
+import java.util.Arrays;
 
-	String[] docs = { "(age in {3} and state in {NY}) or (state in {CA} and gender in {M})",
+public class TestDnf {
+	//0 or 1
+	//2 or 3
+	//4 or 5
+	//6 or 1
+	//3 or 6
+	//3 or 0 or 1 
+	//0 or 5
+	String[] docs = { 
+			"(age in {3} and state in {NY}) or (state in {CA} and gender in {M})",
 			"(age in {3} and gender in {F}) or (state not in {CA, NY})",
 			"(age in {3} and gender in {M} and state not in {CA}) or (state in {CA} and gender in {F})",
-			"(age in {3, 4}) or (state in {CA} and gender in {M})", "(state not in {CA, NY}) or (age in {3, 4})",
+			"(age in {3, 4}) or (state in {CA} and gender in {M})", 
+			"(state not in {CA, NY}) or (age in {3, 4})",
 			"(state not in {CA, NY}) or (age in {3} and state in {NY}) or (state in {CA} and gender in {M})",
 			"(age in {3} and state in {NY}) or (state in {CA} and gender in {F})" };
 	DnfBuild build = new DnfBuild();
@@ -21,6 +31,7 @@ public class TestDnf {
 		long n = System.currentTimeMillis();
 		int[] search = build.search(conds);
 		System.out.println(System.currentTimeMillis() - n);
+		System.out.println(Arrays.toString(search));
 	}
 
 	public static void main(String[] args) {
