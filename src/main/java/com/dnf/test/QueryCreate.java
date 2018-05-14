@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;

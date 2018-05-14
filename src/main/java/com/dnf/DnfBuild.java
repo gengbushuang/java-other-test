@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.antlr.v4.parse.ANTLRParser.id_return;
+
 import com.ibm.icu.text.MessagePattern.Part;
 
 public class DnfBuild {
@@ -38,6 +40,24 @@ public class DnfBuild {
 		int docInternalId = handler.add(doc);
 
 		handler.conjReverse1(docInternalId, doc.conjs.toArray(new Integer[0]));
+	}
+
+	public int[] search(Cond[] conds) {
+		List<Integer> terms = new ArrayList<>();
+
+		for (int i = 0; i < conds.length; i++) {
+			Integer id = handler.termMap.get(conds[i].getKey() + "%" + conds[i].getVal());
+			if (id != null) {
+				terms.add(id);
+			}
+		}
+		if (terms.isEmpty()) {
+			return new int[0];
+		}
+
+		int[] array = terms.stream().mapToInt(x -> x.intValue()).toArray();
+
+		return handler.doSearch(array);
 	}
 
 	private Handler handler = new Handler();
@@ -78,7 +98,6 @@ public class DnfBuild {
 
 			// 下面是assignment
 			i = UtilsDnf.skipSpace(dnf, i);
-			System.out.println(dnf.charAt(i));
 			// 判断{
 			// if (dnf.charAt(i) == '\173') {
 			//
@@ -92,7 +111,6 @@ public class DnfBuild {
 				vals.add(val);
 
 				i = UtilsDnf.skipSpace(dnf, i);
-				System.out.println(dnf.charAt(i));
 				// 判断}
 				if (dnf.charAt(i) == '\175') {
 					break;
@@ -106,7 +124,6 @@ public class DnfBuild {
 			}
 
 			i = UtilsDnf.skipSpace(dnf, i + 1);
-			System.out.println(dnf.charAt(i));
 			if (dnf.charAt(i) == '\051') { // 判断)
 
 				int conjId = handler.add(conj);
@@ -212,6 +229,37 @@ public class DnfBuild {
 		}
 	}
 
+	private class CPair implements Comparable<CPair> {
+		private int conjId;
+		private boolean bool;
+
+		public CPair(int conjId, boolean bool) {
+			this.conjId = conjId;
+			this.bool = bool;
+		}
+
+		@Override
+		public int compareTo(CPair o) {
+			return conjId - o.conjId;
+		}
+	}
+
+	private class TermRvs implements Comparable<TermRvs> {
+		private int termId;
+		private List<CPair> cList;
+
+		public TermRvs(int termId, List<CPair> cList) {
+			this.termId = termId;
+			this.cList = cList;
+		}
+
+		@Override
+		public int compareTo(TermRvs o) {
+			return termId - o.termId;
+		}
+
+	}
+
 	private class Handler {
 		// docs_ *docList
 		private List<Doc> docs_;
@@ -223,7 +271,7 @@ public class DnfBuild {
 
 		private List<List<Integer>> conjRvs;
 
-		private List<List<Integer>> conjSzRvs;
+		private List<List<TermRvs>> conjSzRvs;
 
 		public Handler() {
 			this.docs_ = new ArrayList<>();
@@ -287,6 +335,12 @@ public class DnfBuild {
 			return term.id;
 		}
 
+		/**
+		 * 倒排1
+		 * 
+		 * @param docId
+		 * @param conjIds
+		 */
 		public void conjReverse1(int docId, Integer[] conjIds) {
 			int rvsLen = conjRvs.size();
 			for (int i = 0; i < conjIds.length; i++) {
@@ -304,16 +358,74 @@ public class DnfBuild {
 			}
 		}
 
+		/**
+		 * 倒排2
+		 * 
+		 * @param conj
+		 */
 		public void conjReverse2(Conj conj) {
-//			if (conj.size >= conjSzRvs.size()) {
-//				resizeConjSzRvs(conj.size + 1);
-//			}
-			List<Integer> termRvsList = conjSzRvs.get(conj.size);
+			if (conj.size >= conjSzRvs.size()) {
+				resizeConjSzRvs(conj.size + 1);
+			}
+			List<TermRvs> termRvsList = conjSzRvs.get(conj.size);
+			if (termRvsList == null) {
+				termRvsList = new ArrayList<TermRvs>();
+			}
+
+			List<Integer> amtList = conj.amtList;
+			for (int amtId : amtList) {
+				insertTermRvsList(conj.id, amtId, termRvsList);
+			}
+
+			if (conj.size == 0) {
+				insertTermRvsListEmptySet(conj.id);
+			}
+		}
+
+		private void insertTermRvsListEmptySet(int cid) {
+			List<TermRvs> termrvslist = conjSzRvs.get(0);
+			List<CPair> cList = termrvslist.get(0).cList;
+			insertClist(cid, true, cList);
+		}
+
+		public void insertTermRvsList(int conjId, int amtId, List<TermRvs> list) {
+			Amt amt = amts_.get(amtId);
+
+			List<Integer> terms = amt.terms;
+			for (int i = 0; i < terms.size(); i++) {
+
+				int ids = Collections.binarySearch(list, new TermRvs(terms.get(i), null));
+				if (ids > -1) {
+					List<CPair> cList = list.get(ids).cList;
+					if (cList == null) {
+						list.get(ids).cList = new ArrayList<>();
+						cList = list.get(ids).cList;
+					}
+					insertClist(conjId, amt.belong, cList);
+				} else {
+					List<CPair> cList = new ArrayList<>();
+					cList.add(new CPair(conjId, amt.belong));
+					list.add(new TermRvs(terms.get(i), cList));
+					Collections.sort(list);
+				}
+			}
+		}
+
+		public void insertClist(int conjId, boolean belong, List<CPair> l) {
+			CPair cPair = new CPair(conjId, belong);
+			int idx = Collections.binarySearch(l, cPair);
+			if (idx > -1) {
+				return;
+			}
+			l.add(cPair);
+			Collections.sort(l);
 		}
 
 		public void resizeConjSzRvs(int size) {
-			size = upperPowerOfTwo(size);
-			
+			// size = upperPowerOfTwo(size);
+			for (int i = conjSzRvs.size(); i < size; i++) {
+				conjSzRvs.add(new ArrayList<>());
+			}
 		}
 
 		public int upperPowerOfTwo(int size) {
@@ -322,6 +434,77 @@ public class DnfBuild {
 				a = a << 1;
 			}
 			return a;
+		}
+
+		public int[] doSearch(int[] terms) {
+			int[] conjs = getConjs(terms);
+			if (conjs == null || conjs.length == 0) {
+				return new int[0];
+			}
+			return getDocs(conjs);
+		}
+
+		private int[] getDocs(int[] conjs) {
+			IntSet intSet = new IntSet();
+
+			for (int conj : conjs) {
+				if (conj >= conjRvs.size()) {
+					continue;
+				}
+				List<Integer> doclist = conjRvs.get(conj);
+				if (doclist == null || doclist.isEmpty()) {
+					continue;
+				}
+				for (int doc : doclist) {
+					intSet.Add(doc);
+				}
+
+			}
+			return intSet.ToSlice();
+		}
+
+		private int[] getConjs(int[] terms) {
+			int n = terms.length;
+			if (conjSzRvs.size() <= 0) {
+				System.exit(1);
+			}
+			if (n >= conjSzRvs.size()) {
+				n = conjSzRvs.size() - 1;
+			}
+
+			IntSet intSet = new IntSet();
+
+			for (int i = 0; i <= n; i++) {
+				List<TermRvs> termlist = conjSzRvs.get(i);
+				if (termlist == null || termlist.isEmpty()) {
+					continue;
+				}
+
+				CountSet countSet = new CountSet(i);
+
+				for (Integer term : terms) {
+					int ids = Collections.binarySearch(termlist, new TermRvs(term, null));
+					if (ids > -1 && termlist.get(ids).termId == ids && termlist.get(ids).cList != null) {
+						List<CPair> cList = termlist.get(ids).cList;
+						for (CPair cpPair : cList) {
+							countSet.add(cpPair.conjId, cpPair.bool);
+						}
+					}
+				}
+
+				if (i == 0) {
+					List<CPair> cList = termlist.get(0).cList;
+					for (CPair cpPair : cList) {
+						if (cpPair.bool) {
+							countSet.add(cpPair.conjId, cpPair.bool);
+						}
+					}
+				}
+
+				intSet.AddSlice(countSet.ToSlice());
+			}
+
+			return intSet.ToSlice();
 		}
 	}
 
