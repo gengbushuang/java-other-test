@@ -1,7 +1,6 @@
 package com.dnf;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +56,6 @@ public class DnfBuild {
 		for(int i = 0; i<terms.size();i++) {
 			array[i] = terms.get(i).intValue();
 		}
-//		int[] array = terms.stream().mapToInt(x -> x.intValue()).toArray();
 		return handler.doSearch(array);
 	}
 
@@ -70,7 +68,6 @@ public class DnfBuild {
 
 	public Patr<Integer, Integer> conjParse(String dnf, int i) {
 		String key, val;
-		// List<String> vals = new ArrayList<>(2);
 		String op;
 		boolean bool = false;
 		Conj conj = new Conj(new ArrayList<Integer>());
@@ -213,22 +210,16 @@ public class DnfBuild {
 
 		@Override
 		public String toString() {
-			return "Conj [id=" + id + ", size=" + size + ", amtSorted=" + amtSorted + ", amts=" + Arrays.toString(amts)
-					+ ", amtList=" + amtList + "]";
+			return "Conj [id=" + id + ", size=" + size + ", amtSorted=" + amtSorted + ", amtList=" + amtList + "]";
 		}
 
 		private int id;
 		private int size;
 		private boolean amtSorted;
-		private int[] amts;
 		private List<Integer> amtList;
 
 		public Conj(List<Integer> amtList) {
 			this.amtList = amtList;
-		}
-
-		private DnfBuild getOuterType() {
-			return DnfBuild.this;
 		}
 	}
 
@@ -278,10 +269,6 @@ public class DnfBuild {
 			this.belong = belong;
 		}
 
-		private DnfBuild getOuterType() {
-			return DnfBuild.this;
-		}
-
 	}
 
 	private class Term {
@@ -299,11 +286,6 @@ public class DnfBuild {
 			this.key = key;
 			this.value = value;
 		}
-
-		private DnfBuild getOuterType() {
-			return DnfBuild.this;
-		}
-
 	}
 
 	private class CPair implements Comparable<CPair> {
@@ -400,29 +382,31 @@ public class DnfBuild {
 		}
 
 		public int add(Conj conj) {
+			//查看建立索引ID没,有就返回当前的
 			for (int i = 0; i < conjs_.size(); i++) {
 				if (conjs_.get(i).equals(conj)) {
 					conj.id = i;
 					return i;
 				}
 			}
-
+			//没有就新建一个索引ID
 			conj.id = conjs_.size();
 			conjs_.add(conj);
-
+			
 			conjRvs.add(new ArrayList<Integer>());
 
 			return conj.id;
 		}
 
 		public int add(Amt amt) {
+			//查看建立索引ID没,有就返回当前的
 			for (int i = 0; i < amts_.size(); i++) {
 				if (amts_.get(i).equals(amt)) {
 					amt.id = i;
 					return i;
 				}
 			}
-
+			//没有就新建一个索引ID
 			amt.id = amts_.size();
 			amts_.add(amt);
 
@@ -430,11 +414,13 @@ public class DnfBuild {
 		}
 
 		public int add(Term term) {
+			//这个是把age in {3}组合成age%3
+			//如果有历史数据就返回以前的ID
 			String key = term.key + "%" + term.value;
 			if (termMap.containsKey(key)) {
 				return termMap.get(key);
 			}
-
+			//没有就新建一个ID
 			term.id = terms_.size();
 			terms_.add(term);
 
@@ -445,7 +431,12 @@ public class DnfBuild {
 
 		/**
 		 * 倒排1
-		 * 
+		 *          	| <-- sizeof conjs_ --> |
+   			conjRvs:  	+--+--+--+--+--+--+--+--+
+             			|0 |1 |2 | ...    ...   |
+             			+--+--+--+--+--+--+--+--+
+                 				|
+                 				+--> doc1.id --> doc3.id --> docN.id
 		 * @param docId
 		 * @param conjIds
 		 */
@@ -468,7 +459,23 @@ public class DnfBuild {
 
 		/**
 		 * 倒排2
-		 * 
+		 *  		            +----- sizeof (conj)
+                 				|
+ 					conjSzRvs:  +--+--+--+--+--+--+
+             					|0 |1 | ...  ...  |
+             					+--+--+--+--+--+--+
+                 					|
+                 					+--> +-------+-------+-------+-------+
+                      					|termId |termId |termId |termId |
+      					[]termRvs:      +-------+-------+-------+-------+
+                      					| clist | clist | clist | clist |
+                      					+-------+-------+-------+-------+
+                         						|
+                         						+--> 	+-----+-----+-----+-----+-----+
+                              							|cId:1|cId:4|cId:4|cId:8|cId:9|
+              							[]cPair:        +-----+-----+-----+-----+-----+
+                              							|  ∈  |  ∈  |  ∉  |  ∉  |  ∈  |
+                              							+-----+-----+-----+-----+-----+
 		 * @param conj
 		 */
 		public void conjReverse2(Conj conj) {
@@ -536,13 +543,13 @@ public class DnfBuild {
 			}
 		}
 
-		public int upperPowerOfTwo(int size) {
-			int a = 4;
-			for (; a < size && a > 1;) {
-				a = a << 1;
-			}
-			return a;
-		}
+//		public int upperPowerOfTwo(int size) {
+//			int a = 4;
+//			for (; a < size && a > 1;) {
+//				a = a << 1;
+//			}
+//			return a;
+//		}
 
 		public int[] doSearch(int[] terms) {
 			int[] conjs = getConjs(terms);
