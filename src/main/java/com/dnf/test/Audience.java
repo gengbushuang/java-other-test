@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 public class Audience {
 
 	private int id;
-	
+
 	private String positionId;
 
 	private int ad_plan_id;
@@ -240,16 +240,24 @@ public class Audience {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		if (StringUtils.isNotBlank(language)) {
-			sb.append("language in ").append("{").append(language).append("}");
+			sb.append("la in ").append("{").append(language).append("}");
 		}
 		if (StringUtils.isNotBlank(channel_ids)) {
-			sb.append(" and channel_ids in ").append("{").append(channel_ids).append("}");
+			sb.append(" and cids in ").append("{").append(channel_ids).append("}");
 		}
 		if (StringUtils.isNotBlank(countrys)) {
-			sb.append(" and countrys in ").append("{").append(countrys).append("}");
+			sb.append(" and cy in ");
+			if (country_support_mode == 0) {
+				sb.append("not ");
+			}
+			sb.append("{").append(countrys).append("}");
 		}
 		if (StringUtils.isNotBlank(apps)) {
-			sb.append(" and apps in ").append("{").append(apps).append("}");
+			sb.append(" and apps in ");
+			if (app_support_mode == 0) {
+				sb.append("not ");
+			}
+			sb.append("{").append(apps).append("}");
 		}
 		if (StringUtils.isNotBlank(interests)) {
 			sb.append(" and interests in ").append("{").append(interests).append("}");
@@ -261,7 +269,6 @@ public class Audience {
 		return sb.toString();
 	}
 
-
 	public static void main(String[] args) {
 		Audience audience = new Audience();
 		audience.setApps("23,44,11,33");
@@ -270,12 +277,12 @@ public class Audience {
 		audience.setApp_support_mode(1);
 		audience.setCountry_support_mode(1);
 		audience.setLanguage("AR");
-		
+
 		System.out.println(audience);
-//		IndexCreate indexCreate = new IndexCreate();
-//		
-//		indexCreate.createIndex(audience);
-		
+		// IndexCreate indexCreate = new IndexCreate();
+		//
+		// indexCreate.createIndex(audience);
+
 	}
 
 }

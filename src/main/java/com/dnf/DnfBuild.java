@@ -7,9 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.antlr.v4.parse.ANTLRParser.id_return;
 
-import com.ibm.icu.text.MessagePattern.Part;
 
 public class DnfBuild {
 
@@ -55,17 +53,24 @@ public class DnfBuild {
 		if (terms.isEmpty()) {
 			return new int[0];
 		}
-
-		int[] array = terms.stream().mapToInt(x -> x.intValue()).toArray();
-
+		int [] array = new int[terms.size()];
+		for(int i = 0; i<terms.size();i++) {
+			array[i] = terms.get(i).intValue();
+		}
+//		int[] array = terms.stream().mapToInt(x -> x.intValue()).toArray();
 		return handler.doSearch(array);
 	}
 
 	private Handler handler = new Handler();
 
+	@Override
+	public String toString() {
+		return handler.toString();
+	}
+
 	public Patr<Integer, Integer> conjParse(String dnf, int i) {
 		String key, val;
-		//List<String> vals = new ArrayList<>(2);
+		// List<String> vals = new ArrayList<>(2);
 		String op;
 		boolean bool = false;
 		Conj conj = new Conj(new ArrayList<Integer>());
@@ -186,7 +191,6 @@ public class DnfBuild {
 	 *
 	 */
 	private class Conj {
-		
 
 		@Override
 		public boolean equals(Object obj) {
@@ -195,12 +199,12 @@ public class DnfBuild {
 			if (getClass() != obj.getClass())
 				return false;
 			Conj other = (Conj) obj;
-			if(this.size != other.size)
+			if (this.size != other.size)
 				return false;
-			if(this.amtList.size() != other.amtList.size())
+			if (this.amtList.size() != other.amtList.size())
 				return false;
-			for(int i = 0;i<this.amtList.size();i++){
-				if(this.amtList.get(i)!=other.amtList.get(i)){
+			for (int i = 0; i < this.amtList.size(); i++) {
+				if (this.amtList.get(i) != other.amtList.get(i)) {
 					return false;
 				}
 			}
@@ -209,7 +213,8 @@ public class DnfBuild {
 
 		@Override
 		public String toString() {
-			return "Conj [id=" + id + ", size=" + size + ", amtSorted=" + amtSorted + ", amts=" + Arrays.toString(amts) + ", amtList=" + amtList + "]";
+			return "Conj [id=" + id + ", size=" + size + ", amtSorted=" + amtSorted + ", amts=" + Arrays.toString(amts)
+					+ ", amtList=" + amtList + "]";
 		}
 
 		private int id;
@@ -238,15 +243,7 @@ public class DnfBuild {
 	 *
 	 */
 	private class Amt {
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + id;
-			return result;
-		}
-
+		
 		@Override
 		public boolean equals(Object obj) {
 			if (obj == null)
@@ -254,12 +251,12 @@ public class DnfBuild {
 			if (getClass() != obj.getClass())
 				return false;
 			Amt other = (Amt) obj;
-			if(this.terms.size() != other.terms.size())
+			if (this.terms.size() != other.terms.size())
 				return false;
-			if(this.belong != other.belong)
+			if (this.belong != other.belong)
 				return false;
-			for(int i = 0;i<terms.size();i++){
-				if(terms.get(i)!=other.terms.get(i)){
+			for (int i = 0; i < terms.size(); i++) {
+				if (terms.get(i) != other.terms.get(i)) {
 					return false;
 				}
 			}
@@ -284,7 +281,7 @@ public class DnfBuild {
 		private DnfBuild getOuterType() {
 			return DnfBuild.this;
 		}
-		
+
 	}
 
 	private class Term {
@@ -306,7 +303,7 @@ public class DnfBuild {
 		private DnfBuild getOuterType() {
 			return DnfBuild.this;
 		}
-		
+
 	}
 
 	private class CPair implements Comparable<CPair> {
@@ -327,7 +324,7 @@ public class DnfBuild {
 		public int compareTo(CPair o) {
 			return conjId - o.conjId;
 		}
-		
+
 	}
 
 	private class TermRvs implements Comparable<TermRvs> {
@@ -348,7 +345,7 @@ public class DnfBuild {
 		public int compareTo(TermRvs o) {
 			return termId - o.termId;
 		}
-		
+
 	}
 
 	private class Handler {
@@ -375,6 +372,24 @@ public class DnfBuild {
 			this.conjSzRvs = new ArrayList<>();
 		}
 
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < conjSzRvs.size(); i++) {
+				List<TermRvs> rvs = conjSzRvs.get(i);
+				sb.append("size->").append(i);
+				for (TermRvs termRvs : rvs) {
+					sb.append("\n\t").append("term->").append(termRvs.termId);
+					List<CPair> cList = termRvs.cList;
+					for (CPair pair : cList) {
+						sb.append("\n\t\t").append("conj->" + pair.conjId);
+					}
+				}
+				sb.append("\n");
+			}
+			return sb.toString();
+		}
+
 		public int add(Doc doc) {
 			doc.id = docs_.size();
 			doc.active = true;
@@ -387,6 +402,7 @@ public class DnfBuild {
 		public int add(Conj conj) {
 			for (int i = 0; i < conjs_.size(); i++) {
 				if (conjs_.get(i).equals(conj)) {
+					conj.id = i;
 					return i;
 				}
 			}
@@ -402,6 +418,7 @@ public class DnfBuild {
 		public int add(Amt amt) {
 			for (int i = 0; i < amts_.size(); i++) {
 				if (amts_.get(i).equals(amt)) {
+					amt.id = i;
 					return i;
 				}
 			}
@@ -532,7 +549,8 @@ public class DnfBuild {
 			if (conjs == null || conjs.length == 0) {
 				return new int[0];
 			}
-			return getDocs(conjs);
+			int[] docs = getDocs(conjs);
+			return docs;
 		}
 
 		private int[] getDocs(int[] conjs) {
@@ -564,7 +582,6 @@ public class DnfBuild {
 			}
 
 			IntSet intSet = new IntSet();
-
 			for (int i = 0; i <= n; i++) {
 				List<TermRvs> termlist = conjSzRvs.get(i);
 				if (termlist == null || termlist.isEmpty()) {
@@ -572,17 +589,15 @@ public class DnfBuild {
 				}
 
 				CountSet countSet = new CountSet(i);
-
-				for (Integer term : terms) {
+				for (int term : terms) {
 					int ids = Collections.binarySearch(termlist, new TermRvs(term, null));
-					if (ids > -1 && termlist.get(ids).termId == ids && termlist.get(ids).cList != null) {
+					if (ids > -1 && termlist.get(ids).termId == term && termlist.get(ids).cList != null) {
 						List<CPair> cList = termlist.get(ids).cList;
 						for (CPair cpPair : cList) {
 							countSet.add(cpPair.conjId, cpPair.bool);
 						}
 					}
 				}
-
 				if (i == 0) {
 					List<CPair> cList = termlist.get(0).cList;
 					for (CPair cpPair : cList) {
@@ -591,10 +606,8 @@ public class DnfBuild {
 						}
 					}
 				}
-
 				intSet.AddSlice(countSet.ToSlice());
 			}
-
 			return intSet.ToSlice();
 		}
 	}
