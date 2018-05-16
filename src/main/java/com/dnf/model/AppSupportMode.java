@@ -1,4 +1,4 @@
-package com.dnf.test;
+package com.dnf.model;
 
 import java.util.Random;
 

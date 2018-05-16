@@ -1,4 +1,4 @@
-package com.dnf.test;
+package com.dnf.model;
 
 public class ConstantKey {
 	public static final String BASEKEY = "test:ad:";

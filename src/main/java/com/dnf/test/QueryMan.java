@@ -1,5 +1,7 @@
 package com.dnf.test;
 
+import com.dnf.reverse1.model.Query;
+
 public class QueryMan {
 
 	public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package com.dnf.test;
+package com.dnf.reverse1.model;
 
 public class Query {
 

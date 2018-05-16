@@ -16,6 +16,8 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.dnf.reverse1.model.Query;
+
 import redis.clients.jedis.Jedis;
 
 public class IndexMode {

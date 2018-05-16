@@ -1,4 +1,4 @@
-package com.dnf.test;
+package com.dnf.model;
 
 import org.apache.commons.lang3.StringUtils;
 

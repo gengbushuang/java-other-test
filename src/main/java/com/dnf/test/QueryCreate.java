@@ -9,6 +9,9 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.dnf.model.ConstantKey;
+import com.dnf.reverse1.model.Query;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 
