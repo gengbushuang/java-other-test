@@ -1,4 +1,4 @@
-package com.dnf.test;
+package com.dnf.reverse1;
 
 import java.util.function.Function;
 
@@ -19,9 +19,24 @@ public class ReidsDb {
 		return db;
 	}
 	
+	@Deprecated
+	public void returnResource(Jedis jedis) {
+		if(jedis!=null) {
+			pool.returnResource(jedis);
+		}
+	}
+	
+	@Deprecated
+	public void returnBrokenResource(Jedis jedis) {
+		if(jedis!=null) {
+			pool.returnBrokenResource(jedis);
+		}
+	}
+	
 	public Jedis getJedis(){
 		return pool.getResource();
 	}
+	
 	
 	public <R> R callback(Function<Jedis, R> function){
 		try(Jedis jedis = pool.getResource();){
