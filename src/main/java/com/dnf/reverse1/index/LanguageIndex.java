@@ -19,10 +19,15 @@ public class LanguageIndex implements Index {
 	@Override
 	public void createIndex(Audience audience, IndexBuilder indexBuildr) {
 		String language = audience.getLanguage();
+		String id = String.valueOf(audience.getId());
 		if (StringUtils.isBlank(language)) {
-			indexBuildr.set(ConstantKey.AD_LANGUAGE + "all", String.valueOf(audience.getId()));
+//			indexBuildr.set(ConstantKey.AD_LANGUAGE + "all", String.valueOf(audience.getId()));
+			indexBuildr.zset(ConstantKey.AD_LANGUAGE + "all", audience.getId(), id);
+			indexBuildr.set(id, ConstantKey.AD_LANGUAGE + "all");
 		} else {
-			indexBuildr.set(ConstantKey.AD_LANGUAGE + language, String.valueOf(audience.getId()));
+//			indexBuildr.set(ConstantKey.AD_LANGUAGE + language, String.valueOf(audience.getId()));
+			indexBuildr.zset(ConstantKey.AD_LANGUAGE + language, audience.getId(), id);
+			indexBuildr.set(id, ConstantKey.AD_LANGUAGE + language);
 		}
 	}
 

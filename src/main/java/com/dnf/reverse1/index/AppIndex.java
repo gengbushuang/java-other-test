@@ -22,13 +22,16 @@ public class AppIndex implements Index {
 	public void createIndex(Audience audience, IndexBuilder indexBuildr) {
 		String apps = audience.getApps();
 		int app_support_mode = audience.getApp_support_mode();
+		String id = String.valueOf(audience.getId());
 		// 如果有排除,就创建排除索引
 		if (app_support_mode == 0 && StringUtils.isNotBlank(apps)) {
 			indexBuildr.eliminate(fieldName(), apps, audience.getId());
 		}
 
 		if (StringUtils.isBlank(apps) || app_support_mode == 0) {
-			indexBuildr.set(ConstantKey.AD_APP + "all", String.valueOf(audience.getId()));
+			indexBuildr.set(ConstantKey.AD_APP + "all", id);
+			//indexBuildr.zset(ConstantKey.AD_APP + "all", audience.getId(), id);
+			indexBuildr.set(id, ConstantKey.AD_APP + "all");
 			return;
 		}
 
@@ -36,7 +39,9 @@ public class AppIndex implements Index {
 			String[] appArray = StringUtils.splitByWholeSeparator(apps, ",");
 			String[] keys = Stream.of(appArray).map(x -> ConstantKey.AD_APP + x).toArray(String[]::new);
 			for (String key : keys) {
-				indexBuildr.set(key, String.valueOf(audience.getId()));
+				//indexBuildr.set(key, id);
+				indexBuildr.zset(key, audience.getId(), id);
+				indexBuildr.set(id, key);
 			}
 		}
 	}

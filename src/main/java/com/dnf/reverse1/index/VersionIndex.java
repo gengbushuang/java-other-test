@@ -21,13 +21,18 @@ public class VersionIndex implements Index {
 	@Override
 	public void createIndex(Audience audience, IndexBuilder indexBuildr) {
 		String os_version = audience.getOs_version();
+		String id = String.valueOf(audience.getId());
 		if (StringUtils.isBlank(os_version)) {
-			indexBuildr.set(ConstantKey.AD_VERSION + "all", String.valueOf(audience.getId()));
+			//indexBuildr.set(ConstantKey.AD_VERSION + "all", String.valueOf(audience.getId()));
+			indexBuildr.zset(ConstantKey.AD_VERSION + "all", audience.getId(), id);
+			indexBuildr.set(id, ConstantKey.AD_VERSION + "all");
 		} else {
 			String[] versions = os_version.split(",");
 			String[] keys = Stream.of(versions).map(x -> ConstantKey.AD_VERSION + x).toArray(String[]::new);
 			for (String ver : keys) {
-				indexBuildr.set(ver, String.valueOf(audience.getId()));
+				//indexBuildr.set(ver, String.valueOf(audience.getId()));
+				indexBuildr.zset(ver, audience.getId(), id);
+				indexBuildr.set(id, ver);
 			}
 		}
 	}

@@ -17,7 +17,11 @@ public class PositionIndex implements Index {
 	@Override
 	public void createIndex(Audience audience, IndexBuilder indexBuildr) {
 		String positionId = audience.getPositionId();
-		indexBuildr.set(ConstantKey.AD_POSITION + positionId, String.valueOf(audience.getId()));
+		String id = String.valueOf(audience.getId());
+		//indexBuildr.set(ConstantKey.AD_POSITION + positionId, String.valueOf(audience.getId()));
+		
+		indexBuildr.zset(ConstantKey.AD_POSITION + positionId, audience.getId(), id);
+		indexBuildr.set(id, ConstantKey.AD_POSITION + positionId);
 	}
 
 	@Override

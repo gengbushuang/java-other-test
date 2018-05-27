@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -73,13 +74,31 @@ public class IndexCreate {
 	 * @param audience
 	 */
 	public void IndexDel(Audience audience) {
+		int id = audience.getId();
+		String ids = String.valueOf(id);
 		try (Jedis jedis = ReidsDb.DB().getJedis();) {
-			DelMode delMode = new DelMode(jedis, map);
-			for (Index index : indexs) {
-				index.delIndex(audience, delMode);
+			//获取某个广告倒排字典表的集合
+			Set<String> smembers = jedis.smembers(ids);
+			Pipeline pipelined = jedis.pipelined();
+			//删除倒排字典表对应的广告
+			for(String members:smembers){
+				pipelined.zrem(members, ids);
 			}
-			delMode.execute();
+			//删除这个广告的倒排字典表集合
+			pipelined.del(ids);
+			pipelined.sync();
+			
+//			for(String members:smembers){
+//				jedis.zrem(members, ids);
+//			}
+//			DelMode delMode = new DelMode(jedis, map);
+//			for (Index index : indexs) {
+//				index.delIndex(audience, delMode);
+//			}
+//			delMode.execute();
 		}
+		//删除有排除广告
+		
 	}
 
 	// 临时的
@@ -110,7 +129,7 @@ public class IndexCreate {
 	private BitSet query(Query query, List<Index> indexs) {
 		AsyncContex contex;
 		try (Jedis jedis = ReidsDb.DB().getJedis();) {
-			QueryMode queryMode = new QueryMode(jedis, map);
+			QueryMode queryMode = new QueryMode(""+System.currentTimeMillis(),jedis, map);
 			for (Index index : indexs) {
 				index.queryIndex(query, queryMode);
 			}
@@ -182,10 +201,22 @@ public class IndexCreate {
 			pipelined.sadd(key, member);
 		}
 
+		@Override
+		public void zset(String key,double score,String member) {
+			pipelined.zadd(key, score, member);
+		}
+
+		@Override
+		public void zset(String key, Map<String, Double> scoreMembers) {
+			pipelined.zadd(key, scoreMembers);
+		}
+
 	}
 
+	
+	
 	/**
-	 * 查询
+	 * 查询集合操作
 	 * 
 	 * @author gengbushuang
 	 *
@@ -195,11 +226,13 @@ public class IndexCreate {
 		Map<String, Map<String, BitSet>> map;
 		BitSet bitSet = new BitSet();
 		List<String> keyList = new ArrayList<String>();
+		final String uid;
 
-		public QueryMode(Jedis jedis, Map<String, Map<String, BitSet>> map) {
+		public QueryMode(String uid,Jedis jedis, Map<String, Map<String, BitSet>> map) {
 			this.pipelined = jedis.pipelined();
 			this.pipelined.select(1);
 			this.map = map;
+			this.uid = uid;
 		}
 
 		@Override
@@ -233,9 +266,26 @@ public class IndexCreate {
 
 		public AsyncContex execute() {
 			String[] keyArray = keyList.toArray(new String[0]);
+			//无序交集
 			pipelined.sinter(keyArray);
+			//有序交集
+			//pipelined.zinterstore(uid, keyArray);
+			//获取有序1000的广告
+			//pipelined.zrange(uid, 0, 1000);
+			//pipelined.del(uid);
 			pipelined.del(keyArray);
 			return new AsyncContex(pipelined.syncAndReturnAll(), bitSet);
+		}
+
+		@Override
+		public void zsunion(String field, String dstkey, String... keys) {
+			zsunionstore(dstkey+":"+uid, keys);
+			queryEliminate(field, keys);
+			keyList.add(dstkey);
+		}
+		
+		private void zsunionstore(String dstkey, String... keys){
+			pipelined.zunionstore(dstkey+":"+uid, keys);
 		}
 	}
 

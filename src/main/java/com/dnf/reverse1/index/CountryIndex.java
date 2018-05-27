@@ -22,20 +22,25 @@ public class CountryIndex implements Index {
 	public void createIndex(Audience audience, IndexBuilder indexBuildr) {
 		String countrys = audience.getCountrys();
 		int country_support_mode = audience.getCountry_support_mode();
-
+		String id = String.valueOf(audience.getId());
 		if (country_support_mode == 0 && StringUtils.isNotBlank(countrys)) {
 			indexBuildr.eliminate(fieldName(), countrys, audience.getId());
 		}
 
 		if (StringUtils.isBlank(countrys)) {
-			indexBuildr.set(ConstantKey.AD_COUNTRY + "all", String.valueOf(audience.getId()));
+			//indexBuildr.set(ConstantKey.AD_COUNTRY + "all", String.valueOf(audience.getId()));
+			indexBuildr.zset(ConstantKey.AD_COUNTRY + "all", audience.getId(), id);
+			indexBuildr.set(id, ConstantKey.AD_COUNTRY + "all");
 			return;
 		}
 		if (country_support_mode == 1) {
 			String[] countryArray = StringUtils.splitByWholeSeparator(countrys, ",");
 			String[] keys = Stream.of(countryArray).map(x -> ConstantKey.AD_COUNTRY + x).toArray(String[]::new);
 			for (String key : keys) {
-				indexBuildr.set(key, String.valueOf(audience.getId()));
+				//indexBuildr.set(key, String.valueOf(audience.getId()));
+				indexBuildr.zset(key, audience.getId(), id);
+				//
+				indexBuildr.set(id, key);
 			}
 		}
 
