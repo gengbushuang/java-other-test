@@ -17,7 +17,7 @@ public class BoolQuery {
 		List<Integer> terms = new ArrayList<>(conds.length);
 
 		for (Cond cond : conds) {
-			Integer termId = index.termMap.get(cond.getKey() + "&" + cond.getVal());
+			Integer termId = index.getDictionary(cond.getKey() + "&" + cond.getVal());
 			if (termId != null) {
 				terms.add(termId);
 			}
@@ -46,6 +46,9 @@ public class BoolQuery {
 	private int[] getAdId(int[] conjs, Index index) {
 		IntSet intSet = new IntSet();
 		List<List<Integer>> conjRvs = index.conjRvs;
+		
+//		ConcurrentSkipListMap<Integer, List<Integer>> conjRvs = index.conjRvs;
+		
 
 		for (int conj : conjs) {
 			if (conj >= conjRvs.size()) {

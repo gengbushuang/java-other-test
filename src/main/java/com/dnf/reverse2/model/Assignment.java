@@ -1,11 +1,14 @@
 package com.dnf.reverse2.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Assignment implements Serializable{
+public class Assignment implements Serializable {
 	/**
 	 * 
 	 */
@@ -22,9 +25,14 @@ public class Assignment implements Serializable{
 	}
 
 	public Assignment(List<Integer> list, boolean belong) {
+		this(list, belong, 0);
+	}
+	
+	public Assignment(List<Integer> list, boolean belong,int id) {
 		Collections.sort(list);
 		this.terms = list;
 		this.belong = belong;
+		this.id = id;
 	}
 
 	public boolean isBelong() {
@@ -41,6 +49,26 @@ public class Assignment implements Serializable{
 
 	public List<Integer> getTerms() {
 		return terms;
+	}
+
+	public void wirte(DataOutputStream out) throws IOException {
+		out.writeInt(id);
+		out.writeBoolean(belong);
+		out.writeInt(terms.size());
+		for (Integer term : terms) {
+			out.writeInt(term);
+		}
+	}
+
+	public void read(DataInputStream in) throws IOException {
+		this.id = in.readInt();
+		this.belong = in.readBoolean();
+		int size = in.readInt();
+		List<Integer> tmps = new ArrayList<>(size);
+		for (int i = 0; i < size; i++) {
+			tmps.add(in.readInt());
+		}
+		this.terms = tmps;
 	}
 
 	@Override

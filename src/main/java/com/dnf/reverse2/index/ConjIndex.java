@@ -1,8 +1,7 @@
 package com.dnf.reverse2.index;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.dnf.model.Audience;
 import com.dnf.reverse2.Index;
@@ -27,7 +26,16 @@ public class ConjIndex extends AbsIndex<Conjunction> {
 	}
 
 	private Integer toConjId(Conjunction conjunction, Index index) {
-		List<Conjunction> conjs = index.conjs;
+		Map<Conjunction, Integer> conjsHash = index.conjsHash;
+		Integer integer = conjsHash.get(conjunction);
+		if(integer == null) {
+			integer = conjsHash.size();
+			conjsHash.put(conjunction, integer);
+			conjunction.setId(integer);
+			index.add(conjunction);
+		}
+		return integer;
+//		List<Conjunction> conjs = index.conjs;
 		
 //		int id = Collections.binarySearch(conjs,conjunction,conjunctionComparator);
 //		if(id>-1) {
@@ -37,14 +45,14 @@ public class ConjIndex extends AbsIndex<Conjunction> {
 //			return conjs.get(id).getId();
 //		}
 		
-		for (Conjunction conj : conjs) {
-			if (conj.equals(conjunction)) {
-				return conj.getId();
-			}
-		}
-		
-		conjunction.setId(conjs.size());
-		conjs.add(conjunction);
+//		for (Conjunction conj : conjs) {
+//			if (conj.equals(conjunction)) {
+//				return conj.getId();
+//			}
+//		}
+//		
+//		conjunction.setId(conjs.size());
+//		conjs.add(conjunction);
 		
 		
 //		conjunction.setId(index.conjs.size());
@@ -52,9 +60,7 @@ public class ConjIndex extends AbsIndex<Conjunction> {
 //		
 //		Collections.sort(index.conjs, conjunctionComparator);
 		
-		index.conjRvs.add(new ArrayList<>(4));
-
-		return conjunction.getId();
+//		return conjunction.getId();
 	}
 
 }

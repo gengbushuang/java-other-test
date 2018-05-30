@@ -30,24 +30,26 @@ public class IndexBuild {
 	 * @param index
 	 */
 	public void conjReverse1(Index index, Conjunction conjunction, Audience audience) {
-
 		int adid = audience.getId();
-
-		int rvsLen = index.conjRvs.size();
-
-		if (rvsLen <= conjunction.getId()) {
-			// TODO 这个地方要日志异常
+		
+		int size = index.conjRvs.size();
+		if (conjunction.getId() >= size) {
+			for (int i = size; i < conjunction.getId() + 1; i++) {
+				index.conjRvs.add(new ArrayList<>(4));
+			}
 		}
-
+		
 		List<Integer> rvsDocList = index.conjRvs.get(conjunction.getId());
-		Collections.sort(rvsDocList);
+		
 		int post = Collections.binarySearch(rvsDocList, adid);
 
 		if (post > 0 && post < rvsDocList.size() && rvsDocList.get(post) == adid) {
 			return;
 		}
-
+		
 		rvsDocList.add(adid);
+		
+		Collections.sort(rvsDocList);
 	}
 
 	/**
@@ -89,7 +91,7 @@ public class IndexBuild {
 		ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>> termrvslist = index.conjSzRvs.get(0);
 
 		List<Pair<Integer, Boolean>> list = termrvslist.get(-1);
-		if(list == null) {
+		if (list == null) {
 			list = new ArrayList<>();
 			termrvslist.put(-1, list);
 		}
@@ -99,7 +101,7 @@ public class IndexBuild {
 
 	private void insertTermRvsList(int conjId, Integer assignId,
 			ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>> termRvsList, Index index) {
-		
+
 		Assignment assignment = index.assigns.get(assignId);
 
 		List<Integer> terms = assignment.getTerms();

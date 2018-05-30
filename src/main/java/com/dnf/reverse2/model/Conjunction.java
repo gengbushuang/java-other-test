@@ -1,10 +1,14 @@
 package com.dnf.reverse2.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Conjunction implements Serializable{
+public class Conjunction implements Serializable {
 	/**
 	 * 
 	 */
@@ -17,7 +21,14 @@ public class Conjunction implements Serializable{
 	private List<Integer> assigns;
 
 	public Conjunction(List<Integer> list, int size) {
+		this(list, size, 0);
+	}
+	
+	public Conjunction(List<Integer> list, int size,int id) {
+		
 		Collections.sort(list);
+		
+		this.id = id;
 		this.assigns = list;
 		this.size = size;
 	}
@@ -36,6 +47,26 @@ public class Conjunction implements Serializable{
 
 	public List<Integer> getAssigns() {
 		return assigns;
+	}
+
+	public void wirte(DataOutputStream out) throws IOException {
+		out.writeInt(id);
+		out.writeInt(size);
+		out.writeInt(assigns.size());
+		for (Integer assign : assigns) {
+			out.writeInt(assign);
+		}
+	}
+
+	public void read(DataInputStream in) throws IOException {
+		this.id = in.readInt();
+		this.size = in.readInt();
+		int size = in.readInt();
+		List<Integer> tmps = new ArrayList<>(size);
+		for (int i = 0; i < size; i++) {
+			tmps.add(in.readInt());
+		}
+		this.assigns = tmps;
 	}
 
 	@Override

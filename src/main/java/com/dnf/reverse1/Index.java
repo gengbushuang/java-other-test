@@ -9,5 +9,6 @@ public interface Index {
 	
 	public void queryIndex(Query query,QueryBuilder queryBuilder);
 	
-	public void delIndex(Audience audience,DelBuilder delBuilder);
+	//先注释掉,以后删除
+//	public void delIndex(Audience audience,DelBuilder delBuilder);
 }

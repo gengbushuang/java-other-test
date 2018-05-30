@@ -11,12 +11,18 @@ public abstract class AssignBuild {
 	
 	public Integer toTermId(String key,String value,Index index) {
 		String key_value = key+"&"+value;
-		Integer integer = index.termMap.get(key_value);
-		if (integer == null) {
-			integer = new Integer(index.terms.size());
-			index.termMap.put(key_value, integer);
-			index.terms.add(new Term(integer, key, value));
+		Integer integer = index.getDictionary(key_value);
+		if(integer==null) {
+			integer = index.putDictionary(key_value);
+			index.add(new Term(integer, key, value));
 		}
+		
+//		Integer integer = index.termMap.get(key_value);
+//		if (integer == null) {
+//			integer = new Integer(index.terms.size());
+//			index.termMap.put(key_value, integer);
+//			index.terms.add(new Term(integer, key, value));
+//		}
 		
 		return integer;
 	}

@@ -35,9 +35,9 @@ public class Audience {
 	private String apps;
 	// apps反选标志0反选1正选
 	private int app_support_mode;
-	// 性别，0-男性；1-女性;2-其他
+	// 性别，1-男性；2-女性;3-其他
 	private int gender;
-	// 年龄段，0:(0-17],1:[18,20],2:[21,+∞)
+	// 年龄段，1:(0-17],2:[18,20],3:[21,+∞)
 	private int age_range;
 	// 兴趣标签
 	private String interests;

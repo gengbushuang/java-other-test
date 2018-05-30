@@ -20,6 +20,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 
 import com.dnf.model.Audience;
+import com.dnf.model.ConstantKey;
 import com.dnf.reverse1.model.Query;
 
 import redis.clients.jedis.Jedis;
@@ -73,32 +74,47 @@ public class IndexCreate {
 	 * 
 	 * @param audience
 	 */
-	public void IndexDel(Audience audience) {
+	public void delIndex(Audience audience) {
 		int id = audience.getId();
 		String ids = String.valueOf(id);
+		// 构建排除集会
+		List<String> eliminates = new ArrayList<>();
 		try (Jedis jedis = ReidsDb.DB().getJedis();) {
-			//获取某个广告倒排字典表的集合
-			Set<String> smembers = jedis.smembers(ids);
+			// 获取某个广告倒排字典表的集合
+			Set<String> smembers = jedis.smembers(ConstantKey.AD_ID + ids);
 			Pipeline pipelined = jedis.pipelined();
-			//删除倒排字典表对应的广告
-			for(String members:smembers){
+			// 删除倒排字典表对应的广告
+			for (String members : smembers) {
+				if (members.startsWith("-")) {
+					eliminates.add(members.substring(1, members.length()));
+					continue;
+				}
 				pipelined.zrem(members, ids);
 			}
-			//删除这个广告的倒排字典表集合
-			pipelined.del(ids);
+			if (eliminates.isEmpty()) {
+				return;
+			}
+			// 删除有排除广告
+			for (String eliminate : eliminates) {
+				String[] eliminateArray = eliminate.split(":");
+				if (eliminateArray.length != 2) {
+					continue;
+				}
+				Map<String, BitSet> mapTmp = map.get(eliminateArray[0]);
+				if (mapTmp == null) {
+					continue;
+				}
+				BitSet bitSet = mapTmp.get(eliminateArray[1]);
+				if (bitSet == null) {
+					continue;
+				}
+				bitSet.set(id, false);
+			}
+
+			// 删除这个广告的倒排字典表集合
+			pipelined.del(ConstantKey.AD_ID + ids);
 			pipelined.sync();
-			
-//			for(String members:smembers){
-//				jedis.zrem(members, ids);
-//			}
-//			DelMode delMode = new DelMode(jedis, map);
-//			for (Index index : indexs) {
-//				index.delIndex(audience, delMode);
-//			}
-//			delMode.execute();
 		}
-		//删除有排除广告
-		
 	}
 
 	// 临时的
@@ -129,7 +145,7 @@ public class IndexCreate {
 	private BitSet query(Query query, List<Index> indexs) {
 		AsyncContex contex;
 		try (Jedis jedis = ReidsDb.DB().getJedis();) {
-			QueryMode queryMode = new QueryMode(""+System.currentTimeMillis(),jedis, map);
+			QueryMode queryMode = new QueryMode("" + System.currentTimeMillis(), jedis, map);
 			for (Index index : indexs) {
 				index.queryIndex(query, queryMode);
 			}
@@ -189,7 +205,9 @@ public class IndexCreate {
 					mapTmp.put(s, bitSet);
 				}
 				bitSet.set(id);
+				pipelined.sadd(ConstantKey.AD_ID + String.valueOf(id), "-" + idenf + ":" + s);
 			}
+
 		}
 
 		@Override
@@ -202,7 +220,7 @@ public class IndexCreate {
 		}
 
 		@Override
-		public void zset(String key,double score,String member) {
+		public void zset(String key, double score, String member) {
 			pipelined.zadd(key, score, member);
 		}
 
@@ -211,10 +229,13 @@ public class IndexCreate {
 			pipelined.zadd(key, scoreMembers);
 		}
 
+		@Override
+		public void positiveRow(String key, String... member) {
+			pipelined.sadd(ConstantKey.AD_ID + key, member);
+		}
+
 	}
 
-	
-	
 	/**
 	 * 查询集合操作
 	 * 
@@ -228,7 +249,7 @@ public class IndexCreate {
 		List<String> keyList = new ArrayList<String>();
 		final String uid;
 
-		public QueryMode(String uid,Jedis jedis, Map<String, Map<String, BitSet>> map) {
+		public QueryMode(String uid, Jedis jedis, Map<String, Map<String, BitSet>> map) {
 			this.pipelined = jedis.pipelined();
 			this.pipelined.select(1);
 			this.map = map;
@@ -236,12 +257,13 @@ public class IndexCreate {
 		}
 
 		@Override
-		public void sunion(String field, String dstkey, String... keys) {
+		public void sunion(String dstkey, String... keys) {
 			sunionstore(dstkey, keys);
-			queryEliminate(field, keys);
+			// queryEliminate(field, keys);
 			keyList.add(dstkey);
 		}
 
+		@Override
 		public void queryEliminate(String field, String... keys) {
 			Map<String, BitSet> mb = map.get(field);
 			if (mb == null) {
@@ -266,26 +288,26 @@ public class IndexCreate {
 
 		public AsyncContex execute() {
 			String[] keyArray = keyList.toArray(new String[0]);
-			//无序交集
+			// 无序交集
 			pipelined.sinter(keyArray);
-			//有序交集
-			//pipelined.zinterstore(uid, keyArray);
-			//获取有序1000的广告
-			//pipelined.zrange(uid, 0, 1000);
-			//pipelined.del(uid);
+			// 有序交集
+			// pipelined.zinterstore(uid, keyArray);
+			// 获取有序1000的广告
+			// pipelined.zrange(uid, 0, 1000);
+			// pipelined.del(uid);
 			pipelined.del(keyArray);
 			return new AsyncContex(pipelined.syncAndReturnAll(), bitSet);
 		}
 
 		@Override
 		public void zsunion(String field, String dstkey, String... keys) {
-			zsunionstore(dstkey+":"+uid, keys);
+			zsunionstore(dstkey + ":" + uid, keys);
 			queryEliminate(field, keys);
 			keyList.add(dstkey);
 		}
-		
-		private void zsunionstore(String dstkey, String... keys){
-			pipelined.zunionstore(dstkey+":"+uid, keys);
+
+		private void zsunionstore(String dstkey, String... keys) {
+			pipelined.zunionstore(dstkey + ":" + uid, keys);
 		}
 	}
 
@@ -295,47 +317,48 @@ public class IndexCreate {
 	 * @author gengbushuang
 	 *
 	 */
-	private class DelMode implements DelBuilder {
-		Pipeline pipelined;
-		Map<String, Map<String, BitSet>> map;
-
-		public DelMode(Jedis jedis, Map<String, Map<String, BitSet>> map) {
-			this.pipelined = jedis.pipelined();
-			this.pipelined.select(1);
-			this.map = map;
-		}
-
-		public void del(String key, String... member) {
-			delSrem(key, member);
-		}
-
-		private void delSrem(String key, String... member) {
-			pipelined.srem(key, member);
-		}
-
-		public void delEliminate(String field, String value, int id) {
-			String[] appArray = StringUtils.splitByWholeSeparator(value, ",");
-			delEliminate(field, appArray, id);
-		}
-
-		private void delEliminate(String idenf, String[] values, int id) {
-			Map<String, BitSet> mapTmp = map.get(idenf);
-			if (mapTmp == null) {
-				return;
-			}
-			for (String s : values) {
-				BitSet bitSet = mapTmp.get(s);
-				if (bitSet == null) {
-					continue;
-				}
-				bitSet.set(id, false);
-			}
-		}
-
-		public void execute() {
-			pipelined.sync();
-		}
-	}
+	//先注释掉,以后删除
+//	private class DelMode implements DelBuilder {
+//		Pipeline pipelined;
+//		Map<String, Map<String, BitSet>> map;
+//
+//		public DelMode(Jedis jedis, Map<String, Map<String, BitSet>> map) {
+//			this.pipelined = jedis.pipelined();
+//			this.pipelined.select(1);
+//			this.map = map;
+//		}
+//
+//		public void del(String key, String... member) {
+//			delSrem(key, member);
+//		}
+//
+//		private void delSrem(String key, String... member) {
+//			pipelined.srem(key, member);
+//		}
+//
+//		public void delEliminate(String field, String value, int id) {
+//			String[] appArray = StringUtils.splitByWholeSeparator(value, ",");
+//			delEliminate(field, appArray, id);
+//		}
+//
+//		private void delEliminate(String idenf, String[] values, int id) {
+//			Map<String, BitSet> mapTmp = map.get(idenf);
+//			if (mapTmp == null) {
+//				return;
+//			}
+//			for (String s : values) {
+//				BitSet bitSet = mapTmp.get(s);
+//				if (bitSet == null) {
+//					continue;
+//				}
+//				bitSet.set(id, false);
+//			}
+//		}
+//
+//		public void execute() {
+//			pipelined.sync();
+//		}
+//	}
 
 	private static class AsyncContex {
 		private List<Object> objects;

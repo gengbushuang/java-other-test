@@ -3,6 +3,15 @@ package com.dnf.reverse1;
 import java.util.Map;
 
 public interface IndexBuilder {
+
+	/**
+	 * 正排关联
+	 * 
+	 * @param key
+	 * @param member
+	 */
+	public void positiveRow(String key, String... member);
+
 	/**
 	 * 无序队列
 	 * 
@@ -29,11 +38,11 @@ public interface IndexBuilder {
 	public void zset(String key, Map<String, Double> scoreMembers);
 
 	/**
-	 * 排除
+	 * 排除构建，map->map->id
 	 * 
-	 * @param idenf
-	 * @param apps
-	 * @param id
+	 * @param idenf 第一层key
+	 * @param apps 第二层的key
+	 * @param id 第三层的数据
 	 */
 	public void eliminate(String idenf, String apps, int id);
 }

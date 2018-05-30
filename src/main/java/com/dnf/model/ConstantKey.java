@@ -2,6 +2,8 @@ package com.dnf.model;
 
 public class ConstantKey {
 	public static final String BASEKEY = "test:ad:";
+	//
+	public static final String AD_ID = BASEKEY + "id:";
 
 	// 广告位
 	public static final String POSITION = "pn";
