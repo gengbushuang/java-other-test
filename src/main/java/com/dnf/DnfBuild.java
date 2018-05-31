@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.dnf.reverse2.set.CountSet;
+import com.dnf.reverse2.set.IntSet;
+
 
 
 public class DnfBuild {

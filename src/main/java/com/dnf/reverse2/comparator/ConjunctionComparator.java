@@ -8,7 +8,7 @@ public class ConjunctionComparator implements Comparator<Conjunction>{
 	
 	@Override
 	public int compare(Conjunction o1, Conjunction o2) {
-		return o1.hashCode()-o2.hashCode();
+		return o1.getId()-o2.getId();
 	}
 	
 	

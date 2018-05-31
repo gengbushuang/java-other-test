@@ -1,27 +1,21 @@
 package com.dnf.reverse2.index;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.dnf.model.Audience;
 import com.dnf.reverse2.Index;
-import com.dnf.reverse2.comparator.PairComparator;
-import com.dnf.reverse2.model.Assignment;
 import com.dnf.reverse2.model.Conjunction;
-import com.dnf.reverse2.model.Pair;
+import com.dnf.reverse2.model.Doc;
 
 public class IndexBuild {
 
 	ConjIndex conjIndex = new ConjIndex();
 
 	public void appendIndex(Index index, Audience audience) {
-		Conjunction conjunction = analysisConjunction(index, audience);
+		Doc doc = analysisDoc(index, audience);
 
-		conjReverse1(index, conjunction, audience);
-
-		conjReverse2(index, conjunction);
+		conjReverse1(index, doc);
 	}
 
 	/**
@@ -29,27 +23,13 @@ public class IndexBuild {
 	 * 
 	 * @param index
 	 */
-	public void conjReverse1(Index index, Conjunction conjunction, Audience audience) {
-		int adid = audience.getId();
-		
-		int size = index.conjRvs.size();
-		if (conjunction.getId() >= size) {
-			for (int i = size; i < conjunction.getId() + 1; i++) {
-				index.conjRvs.add(new ArrayList<>(4));
-			}
-		}
-		
-		List<Integer> rvsDocList = index.conjRvs.get(conjunction.getId());
-		
-		int post = Collections.binarySearch(rvsDocList, adid);
+	public void conjReverse1(Index index, Doc doc) {
+		int adid = doc.getId();
+		List<Integer> conjs = doc.getConjs();
 
-		if (post > 0 && post < rvsDocList.size() && rvsDocList.get(post) == adid) {
-			return;
+		for (Integer conjId : conjs) {
+			index.conjReverse1(conjId, adid);
 		}
-		
-		rvsDocList.add(adid);
-		
-		Collections.sort(rvsDocList);
 	}
 
 	/**
@@ -59,76 +39,25 @@ public class IndexBuild {
 	 * @param conjunction
 	 */
 	public void conjReverse2(Index index, Conjunction conjunction) {
-
-		int size = conjunction.getSize();
-		if (size >= index.conjSzRvs.size()) {
-			resizeConjSzRvs(size + 1, index);
-		}
-
-		ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>> termRvsList = index.conjSzRvs.get(size);
-		if (termRvsList == null) {
-			termRvsList = new ConcurrentSkipListMap<>();
-		}
-
-		List<Integer> assigns = conjunction.getAssigns();
-		for (Integer assignId : assigns) {
-			insertTermRvsList(conjunction.getId(), assignId, termRvsList, index);
-		}
-
-		if (size == 0) {
-			insertTermRvsListEmptySet(conjunction.getId(), index);
-		}
+		index.conjReverse2(conjunction);
 	}
 
-	private void resizeConjSzRvs(int size, Index index) {
-		List<ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>>> conjSzRvs = index.conjSzRvs;
-		for (int i = conjSzRvs.size(); i < size; i++) {
-			conjSzRvs.add(new ConcurrentSkipListMap<>());
-		}
+	public Doc analysisDoc(Index index, Audience audience) {
+
+		Conjunction conj = conjIndex.build(audience, index);
+		conjReverse2(index, conj);
+
+		List<Integer> integers = new ArrayList<>(1);
+		integers.add(conj.getId());
+		Doc doc = new Doc(integers, audience.getId());
+
+		index.add(doc);
+
+		return doc;
 	}
-
-	private void insertTermRvsListEmptySet(int conjId, Index index) {
-		ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>> termrvslist = index.conjSzRvs.get(0);
-
-		List<Pair<Integer, Boolean>> list = termrvslist.get(-1);
-		if (list == null) {
-			list = new ArrayList<>();
-			termrvslist.put(-1, list);
-		}
-
-		insertClist(conjId, true, list);
+	
+	public void del(Index index, Audience audience) {
+		Doc doc = new Doc(null, audience.getId());
+		index.del(doc);
 	}
-
-	private void insertTermRvsList(int conjId, Integer assignId,
-			ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>> termRvsList, Index index) {
-
-		Assignment assignment = index.assigns.get(assignId);
-
-		List<Integer> terms = assignment.getTerms();
-
-		for (Integer termId : terms) {
-			List<Pair<Integer, Boolean>> list = termRvsList.get(termId);
-			if (list == null) {
-				list = new ArrayList<>();
-				termRvsList.put(termId, list);
-			}
-			insertClist(conjId, assignment.isBelong(), list);
-		}
-	}
-
-	private void insertClist(int conjId, boolean belong, List<Pair<Integer, Boolean>> list) {
-		Pair<Integer, Boolean> patr = new Pair<Integer, Boolean>(conjId, belong);
-		int idx = Collections.binarySearch(list, patr, pairComparator);
-		if (idx > -1) {
-			return;
-		}
-		list.add(patr);
-		Collections.sort(list, pairComparator);
-	}
-
-	public Conjunction analysisConjunction(Index index, Audience audience) {
-		return conjIndex.build(audience, index);
-	}
-
-	static PairComparator pairComparator = new PairComparator();
 }

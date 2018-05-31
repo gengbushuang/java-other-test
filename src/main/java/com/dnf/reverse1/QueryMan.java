@@ -12,7 +12,7 @@ public class QueryMan {
 		query.setCountry("us");
 		query.setApps("3,4");
 		query.setLanguage("es");
-		query.setVer("a_2");
+		query.setVer("android_2");
 
 		
 		for (int i = 0; i < 40; i++) {

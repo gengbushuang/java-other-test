@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.dnf.reverse2.model.Assignment;
 import com.dnf.reverse2.model.Conjunction;
+import com.dnf.reverse2.model.Doc;
 import com.dnf.reverse2.model.Term;
 
 public class BinaryUtils {
@@ -15,6 +16,8 @@ public class BinaryUtils {
 	public final static int CONJ_HEAD_SIZE = Integer.BYTES * 3;
 
 	public final static int TERM_HEAD_SIZE = Integer.BYTES * 3;
+
+	public final static int DOC_HEAD_SIZE = Integer.BYTES * 2;
 
 	// long转换byte
 	public static byte[] longToBytes(long value) {
@@ -114,6 +117,39 @@ public class BinaryUtils {
 		buffer.put(bytes_value);
 
 		return buffer.array();
+	}
+
+	public static byte[] docToByte(Doc doc) {
+		List<Integer> conjs = doc.getConjs();
+		List<byte[]> bytes = new ArrayList<>(conjs.size());
+		int size = 0;
+		for (int conjId : conjs) {
+			byte[] intToBytes = intToBytes(conjId);
+			size += intToBytes.length;
+			bytes.add(intToBytes);
+		}
+		ByteBuffer buffer = ByteBuffer.allocate(DOC_HEAD_SIZE + size);
+
+		buffer.put(intToBytes(doc.getId()));
+		buffer.put(intToBytes(size));
+		if (!bytes.isEmpty()) {
+			for (byte[] bs : bytes) {
+				buffer.put(bs);
+			}
+		}
+		return buffer.array();
+	}
+
+	public static Doc byteToDoc(byte[] data) {
+		ByteBuffer wrap = ByteBuffer.wrap(data);
+		int id = wrap.getInt();
+		int length = wrap.getInt();
+		byte[] bytes = new byte[length];
+		wrap.get(bytes);
+
+		List<Integer> integers = byteToInteger(bytes);
+
+		return new Doc(integers, id);
 	}
 
 	public static Term byteToTerm(byte[] data) {

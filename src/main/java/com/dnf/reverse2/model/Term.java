@@ -1,47 +1,27 @@
 package com.dnf.reverse2.model;
 
-import java.io.Serializable;
-
-public class Term implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2228628048806616561L;
-
-	private Integer id;
+public class Term extends ID{
 
 	private String key;
 
 	private String value;
 
+	public Term(String key,String value) {
+		this(0, key, value);
+	}
+	
 	public Term(Integer id, String key, String value) {
-		this.id = id;
+		super(id);
 		this.key = key;
 		this.value = value;
-	}
-
-	public Integer getId() {
-		return id;
 	}
 
 	public String getKey() {
 		return key;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}
-
 	public String getValue() {
 		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	@Override
@@ -75,8 +55,9 @@ public class Term implements Serializable{
 		return true;
 	}
 
+
 	@Override
 	public String toString() {
-		return "Term [id=" + id + ", key=" + key + ", value=" + value + "]";
+		return "Term [key=" + key + ", value=" + value + ", getId()=" + getId() + "]";
 	}
 }

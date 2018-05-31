@@ -1,9 +1,10 @@
 package com.dnf.reverse2.model;
 
+import java.util.Collections;
 import java.util.List;
 
-public class Doc {
-	private int id;
+public class Doc extends ID {
+	
 	private List<Integer> conjs;
 
 	public Doc(List<Integer> list) {
@@ -11,16 +12,12 @@ public class Doc {
 	}
 
 	public Doc(List<Integer> list, int id) {
-		this.id = id;
+		super(id);
+		if (list != null) {
+			Collections.sort(list);
+		}
+	
 		this.conjs = list;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public List<Integer> getConjs() {

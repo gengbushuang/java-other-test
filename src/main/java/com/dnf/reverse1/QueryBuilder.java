@@ -8,7 +8,11 @@ public interface QueryBuilder {
 	 * @param dstkey
 	 * @param keys
 	 */
-	public void sunion(String field, String dstkey, String... keys);
+	public void sunion(String dstkey, String... keys);
+	/**
+	 * 排出查询
+	 */
+	public void queryEliminate(String field, String... keys);
 
 	/**
 	 * set交集(有序集合)

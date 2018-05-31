@@ -151,31 +151,44 @@ public class MainIndex {
 
 
 	public static void main(String[] args) throws IOException {
-		String path = "D:/index.log";
 		Index index = new Index();
 		
 //		IndexBuild indexBuild = new IndexBuild();
+		
+//		Audience audience = new Audience();
+//		audience.setId(3);
+//		
+//		indexBuild.del(index, audience);
+////		
+//		audience = new Audience();
+//		audience.setId(9);
+////		
+//		indexBuild.del(index, audience);
 //		
 //		List<Audience> audiences = createAudiences();
 //		
 //		for(Audience audience:audiences) {
 //			indexBuild.appendIndex(index, audience);
 //		}
-//		
 //		index.flush();
 //		wirteEliminateIndex(index, path);
 	
 //		Index index = readEliminateIndex(path);
 //		
 //		System.out.println(index);
-//		for(int i = 0; i<40;i++) {
-//		long n = System.currentTimeMillis();
-//		Cond[] conds = { new Cond("country", "广州"),new Cond("age", "3")};
-//		BoolQuery boolQuery = new BoolQuery();
-//		int[] query = boolQuery.query(conds, index);
-//		System.out.println(System.currentTimeMillis()-n);
-////		
-//		System.out.println(Arrays.toString(query));
-//		}
+		
+		
+		
+		
+		
+		for(int i = 0; i<40;i++) {
+		long n = System.currentTimeMillis();
+		Cond[] conds = { new Cond("country", "广州"),new Cond("age", "3")};
+		BoolQuery boolQuery = new BoolQuery();
+		int[] query = boolQuery.query(conds, index);
+		System.out.println(System.currentTimeMillis()-n);
+//		
+		System.out.println(Arrays.toString(query));
+		}
 	}
 }

@@ -3,19 +3,12 @@ package com.dnf.reverse2.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Conjunction implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7855402431160915525L;
-
-	private int id;
-
+public class Conjunction extends ID {
+	
 	private int size;
 
 	private List<Integer> assigns;
@@ -25,20 +18,13 @@ public class Conjunction implements Serializable {
 	}
 	
 	public Conjunction(List<Integer> list, int size,int id) {
+		super(id);
+		if (list != null) {
+			Collections.sort(list);
+		}
 		
-		Collections.sort(list);
-		
-		this.id = id;
 		this.assigns = list;
 		this.size = size;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public int getSize() {
@@ -50,7 +36,7 @@ public class Conjunction implements Serializable {
 	}
 
 	public void wirte(DataOutputStream out) throws IOException {
-		out.writeInt(id);
+		out.writeInt(this.getId());
 		out.writeInt(size);
 		out.writeInt(assigns.size());
 		for (Integer assign : assigns) {
@@ -59,7 +45,7 @@ public class Conjunction implements Serializable {
 	}
 
 	public void read(DataInputStream in) throws IOException {
-		this.id = in.readInt();
+		this.setId(in.readInt());
 		this.size = in.readInt();
 		int size = in.readInt();
 		List<Integer> tmps = new ArrayList<>(size);
@@ -100,6 +86,6 @@ public class Conjunction implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Conjunction [id=" + id + ", size=" + size + ", assigns=" + assigns + "]";
+		return "Conjunction [size=" + size + ", assigns=" + assigns + ", getId()=" + getId() + "]";
 	}
 }
