@@ -39,26 +39,25 @@ public class BoolQuery {
 		if (conjs == null || conjs.length == 0) {
 			return new int[0];
 		}
-
 		return getAdId(conjs, index);
 	}
 
 	private int[] getAdId(int[] conjs, Index index) {
 		IntSet intSet = new IntSet();
 		ConcurrentSkipListMap<Integer, List<Integer>> conjRvs = index.getConjRvs();
+		int size = conjRvs.keySet().size();
 
-		for (int conj : conjs) {
-			if (conj >= conjRvs.size()) {
+		for (int i = 0; i < conjs.length; i++) {
+			if (conjs[i] >= size) {
 				continue;
 			}
-			List<Integer> doclist = conjRvs.get(conj);
+			List<Integer> doclist = conjRvs.get(conjs[i]);
 			if (doclist == null || doclist.isEmpty()) {
 				continue;
 			}
 			for (int doc : doclist) {
 				intSet.Add(doc);
 			}
-
 		}
 		return intSet.ToSlice();
 	}
@@ -68,12 +67,14 @@ public class BoolQuery {
 
 		List<ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>>> conjSzRvs = index.getConjSzRvs();
 
-		if (conjSzRvs.size() < 0) {
+		int size = conjSzRvs.size();
+
+		if (size < 0) {
 			System.exit(1);
 		}
 
-		if (n >= conjSzRvs.size()) {
-			n = conjSzRvs.size() - 1;
+		if (n >= size) {
+			n = size - 1;
 		}
 
 		IntSet intSet = new IntSet();

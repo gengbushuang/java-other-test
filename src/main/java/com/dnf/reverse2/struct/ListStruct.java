@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
 
 import com.dnf.reverse1.ReidsDb;
@@ -18,6 +19,7 @@ public class ListStruct<T extends ID> implements Iterable<T> {
 
 	private List<T> lists;
 
+	
 	private Map<T, Integer> maps;
 
 	public ListStruct() {
@@ -31,6 +33,13 @@ public class ListStruct<T extends ID> implements Iterable<T> {
 
 	public Integer mapToInteger(T t) {
 		return maps.get(t);
+	}
+	
+	public void sss(T t) {
+		Integer integer = maps.get(t);
+		if(integer == null) {
+			
+		}
 	}
 
 	public void sort(Comparator<T> c) {
@@ -49,6 +58,7 @@ public class ListStruct<T extends ID> implements Iterable<T> {
 		lists.add(t);
 		maps.put(t, t.getId());
 	}
+	
 
 	public void add(T t, String key, Function<T, byte[]> function) {
 		add(t);
@@ -57,7 +67,6 @@ public class ListStruct<T extends ID> implements Iterable<T> {
 		jedis.select(1);
 
 		jedis.sadd(key.getBytes(), function.apply(t));
-
 		jedis.close();
 	}
 

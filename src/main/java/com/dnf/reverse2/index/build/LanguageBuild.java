@@ -21,7 +21,7 @@ public class LanguageBuild extends AssignBuild {
 
 		List<Integer> terms = new ArrayList<>(1);
 		
-		Integer termId = super.toTermId("Language", language, index);
+		Integer termId = super.toTermId("language", language, index);
 		
 		terms.add(termId);
 

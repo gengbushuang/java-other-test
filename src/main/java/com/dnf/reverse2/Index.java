@@ -47,8 +47,10 @@ public class Index {
 
 	ListStruct<Doc> docs;
 
-	private ConcurrentSkipListMap<Integer, List<Integer>> conjRvs = new ConcurrentSkipListMap<>();
+	// private List<List<Integer>> conjRvs = new ArrayList<>();
 
+	private ConcurrentSkipListMap<Integer, List<Integer>> conjRvs = new ConcurrentSkipListMap<>();
+	//
 	private List<ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>>> conjSzRvs = new ArrayList<>(5);
 
 	public Index() {
@@ -125,10 +127,15 @@ public class Index {
 		conjs.sort(conjunctionComparator);
 	}
 
+	// public List<List<Integer>> getConjRvs() {
+	// return conjRvs;
+	// }
+
 	public ConcurrentSkipListMap<Integer, List<Integer>> getConjRvs() {
 		return conjRvs;
 	}
 
+	//
 	public List<ConcurrentSkipListMap<Integer, List<Pair<Integer, Boolean>>>> getConjSzRvs() {
 		return conjSzRvs;
 	}
@@ -138,12 +145,13 @@ public class Index {
 		if (integer == null) {
 			Term toMax = dictionary.listToMax();
 			if (toMax == null) {
-				integer = new Integer(0);
+				integer = new Integer(1);
 			} else {
 				integer = new Integer(toMax.getId() + 1);
 			}
 			term.setId(integer);
-			dictionary.add(term, term_key, t -> BinaryUtils.termToByte(t));
+			dictionary.add(term);
+			// dictionary.add(term, term_key, t -> BinaryUtils.termToByte(t));
 		}
 		return integer;
 	}
@@ -158,7 +166,9 @@ public class Index {
 				integer = new Integer(toMax.getId() + 1);
 			}
 			assignment.setId(integer);
-			assigns.add(assignment, assign_key, assign -> BinaryUtils.assignToByte(assign));
+			assigns.add(assignment);
+			// assigns.add(assignment, assign_key, assign ->
+			// BinaryUtils.assignToByte(assign));
 		}
 		return integer;
 	}
@@ -173,7 +183,8 @@ public class Index {
 				integer = new Integer(toMax.getId() + 1);
 			}
 			conjunction.setId(integer);
-			conjs.add(conjunction, conj_key, conj -> BinaryUtils.conjToByte(conj));
+			conjs.add(conjunction);
+			// conjs.add(conjunction, conj_key, conj -> BinaryUtils.conjToByte(conj));
 		}
 		return integer;
 	}
@@ -184,7 +195,8 @@ public class Index {
 		if (index > -1) {
 			return;
 		}
-		docs.add(doc, doc_key, d -> BinaryUtils.docToByte(d));
+		docs.add(doc);
+		// docs.add(doc, doc_key, d -> BinaryUtils.docToByte(d));
 	}
 
 	public Integer queryToTermId(String key, String value) {
@@ -198,7 +210,7 @@ public class Index {
 	 * @param adid
 	 */
 	public void conjReverse1(Integer conjId, int adid) {
-		int size = conjRvs.size();
+		int size = conjRvs.keySet().size();
 		if (conjId >= size) {
 			for (int i = size; i < conjId + 1; i++) {
 				conjRvs.put(i, new ArrayList<>(10));
@@ -315,9 +327,9 @@ public class Index {
 				continue;
 			}
 			list.remove(index_conj);
-		};
-		
-		docs.del(index_doc,doc_key,d -> BinaryUtils.docToByte(d));
+		}
+
+		docs.del(index_doc, doc_key, d -> BinaryUtils.docToByte(d));
 	}
 
 }

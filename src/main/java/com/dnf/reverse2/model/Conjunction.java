@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Conjunction extends ID {
-	
+
 	private int size;
 
 	private List<Integer> assigns;
@@ -16,13 +16,13 @@ public class Conjunction extends ID {
 	public Conjunction(List<Integer> list, int size) {
 		this(list, size, 0);
 	}
-	
-	public Conjunction(List<Integer> list, int size,int id) {
+
+	public Conjunction(List<Integer> list, int size, int id) {
 		super(id);
 		if (list != null) {
 			Collections.sort(list);
 		}
-		
+
 		this.assigns = list;
 		this.size = size;
 	}
@@ -86,6 +86,15 @@ public class Conjunction extends ID {
 
 	@Override
 	public String toString() {
-		return "Conjunction [size=" + size + ", assigns=" + assigns + ", getId()=" + getId() + "]";
+		StringBuilder sb = new StringBuilder(50);
+		sb.append("{\"id\":").append(getId()).append(",\"terms\":[");
+		for (int i = 0; i < assigns.size(); i++) {
+			if (i != 0) {
+				sb.append(",");
+			}
+			sb.append(assigns.get(i));
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 }

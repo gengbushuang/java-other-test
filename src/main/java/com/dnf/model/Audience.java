@@ -240,31 +240,42 @@ public class Audience {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		if (StringUtils.isNotBlank(language)) {
-			sb.append("la in ").append("{").append(language).append("}");
+			sb.append("language in ").append("{").append(language).append("}");
+			sb.append(" and ");
 		}
 		if (StringUtils.isNotBlank(channel_ids)) {
-			sb.append(" and cids in ").append("{").append(channel_ids).append("}");
+			sb.append("cids in ").append("{").append(channel_ids).append("}");
+			sb.append(" and ");
 		}
 		if (StringUtils.isNotBlank(countrys)) {
-			sb.append(" and cy in ");
+			sb.append("country ");
 			if (country_support_mode == 0) {
 				sb.append("not ");
+			}else {
+				sb.append("in ");
 			}
 			sb.append("{").append(countrys).append("}");
+			sb.append(" and ");
 		}
 		if (StringUtils.isNotBlank(apps)) {
-			sb.append(" and apps in ");
+			sb.append("app ");
 			if (app_support_mode == 0) {
 				sb.append("not ");
+			}else {
+				sb.append("in ");
 			}
 			sb.append("{").append(apps).append("}");
+			sb.append(" and ");
 		}
 		if (StringUtils.isNotBlank(interests)) {
-			sb.append(" and interests in ").append("{").append(interests).append("}");
+			sb.append("interests in ").append("{").append(interests).append("}");
+			sb.append(" and ");
 		}
 		if (StringUtils.isNotBlank(behaviors)) {
-			sb.append(" and behaviors in ").append("{").append(behaviors).append("}");
+			sb.append("behaviors in ").append("{").append(behaviors).append("}");
+			sb.append(" and ");
 		}
+		sb.setLength(sb.length()-5);
 		sb.append(")");
 		return sb.toString();
 	}

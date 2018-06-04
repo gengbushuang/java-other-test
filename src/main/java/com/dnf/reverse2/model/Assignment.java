@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Assignment extends ID {
 
@@ -88,7 +90,23 @@ public class Assignment extends ID {
 
 	@Override
 	public String toString() {
-		return "Assignment [belong=" + belong + ", terms=" + terms + ", getId()=" + getId() + "]";
+		StringBuilder sb = new StringBuilder(50);
+		sb.append("{\"id\":").append(getId()).append(",\"belong\":\"").append(belong).append("\",\"terms\":[");
+		for (int i = 0; i < terms.size(); i++) {
+			if (i != 0) {
+				sb.append(",");
+			}
+			sb.append(terms.get(i));
+		}
+		sb.append("]}");
+		return sb.toString();
 	}
 	
+	public static void main(String[] args) {
+		List<Integer> collect = Stream.of(1,3,4).collect(Collectors.toList());
+		Assignment assignment = new Assignment(collect, false);
+		assignment.setId(5);
+		System.out.println(assignment);
+	}
+
 }

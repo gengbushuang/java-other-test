@@ -1,7 +1,6 @@
 package com.dnf;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -10,8 +9,13 @@ import com.dnf.model.Audience;
 import com.dnf.model.Country;
 import com.dnf.model.Language;
 import com.dnf.model.Position;
+import com.dnf.reverse2.Index;
+import com.dnf.reverse2.IndexDNF;
+import com.dnf.reverse2.query.BoolQuery;
 
 public class MainTest {
+	
+	Index index = new Index();
 	
 	public List<Audience> createList2(int count, int appCount) {
 		List<Audience> audiences = new ArrayList<Audience>();
@@ -91,17 +95,25 @@ public class MainTest {
 	}
 
 	public void index() {
+		IndexDNF indexDNF = new IndexDNF();
 		// 建立索引还没有优化,100000的建立需要10多分钟
 		List<Audience> createList = createList(10000, 50);
 		long n = System.currentTimeMillis();
 		for (Audience audience : createList) {
-			build.AddDoc("ad" + audience.getId(), String.valueOf(audience.getId()), audience.toString());
+			try {
+			indexDNF.appendIndex(index, audience.toString(), audience.getId());
+			//build.AddDoc("ad" + audience.getId(), String.valueOf(audience.getId()), audience.toString());
+			}catch(Exception e) {
+				System.out.println(audience);
+				System.exit(1);
+			}
 		}
 		System.out.println(System.currentTimeMillis() - n);
 		System.out.println("--------------------------索引建完");
 	}
 
 	public void query() {
+		BoolQuery boolQuery = new BoolQuery();
 		for (;;) {
 			// 随机生成查询语句
 			List<Audience> createList = createList2(1000, 10);
@@ -110,15 +122,16 @@ public class MainTest {
 				String[] split = audience.getApps().split(",");
 				List<Cond> conds = new ArrayList<>();
 				for (String s : split) {
-					conds.add(new Cond("apps", s));
+					conds.add(new Cond("app", s));
 				}
-				conds.add(new Cond("la", audience.getLanguage()));
-				conds.add(new Cond("cy", audience.getCountrys()));
-				int[] search = build.search(conds.toArray(new Cond[0]));
+				conds.add(new Cond("language", audience.getLanguage()));
+				conds.add(new Cond("country", audience.getCountrys()));
+				int[] search = boolQuery.query(conds.toArray(new Cond[0]), index);
+				//int[] search = build.search(conds.toArray(new Cond[0]));
 				if (search.length != 0) {
 					System.out.println("有数据了");
 					System.out.println(System.currentTimeMillis() - n);
-					System.out.println(Arrays.toString(search));
+					//System.out.println(Arrays.toString(search));
 				}
 				// System.out.println(System.currentTimeMillis()-n);
 				// System.out.println(Arrays.toString(search));

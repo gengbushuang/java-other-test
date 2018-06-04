@@ -1,15 +1,15 @@
 package com.dnf.reverse2.model;
 
-public class Term extends ID{
+public class Term extends ID {
 
 	private String key;
 
 	private String value;
 
-	public Term(String key,String value) {
+	public Term(String key, String value) {
 		this(0, key, value);
 	}
-	
+
 	public Term(Integer id, String key, String value) {
 		super(id);
 		this.key = key;
@@ -55,9 +55,16 @@ public class Term extends ID{
 		return true;
 	}
 
-
 	@Override
 	public String toString() {
-		return "Term [key=" + key + ", value=" + value + ", getId()=" + getId() + "]";
+		StringBuilder sb = new StringBuilder(50);
+		sb.append("{\"id\":").append(getId()).append(",\"key\":\"").append(key).append("\",\"value\":\"").append(value)
+				.append("\"}");
+		return sb.toString();
+	}
+	
+	public static void main(String[] args) {
+		Term term = new Term(2, "wo", "men");
+		System.out.println(term);
 	}
 }
