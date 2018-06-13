@@ -36,10 +36,7 @@ public class ListStruct<T extends ID> implements Iterable<T> {
 	}
 	
 	public void sss(T t) {
-		Integer integer = maps.get(t);
-		if(integer == null) {
-			
-		}
+		
 	}
 
 	public void sort(Comparator<T> c) {
