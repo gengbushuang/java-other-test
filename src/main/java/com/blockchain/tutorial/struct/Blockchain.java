@@ -1,5 +1,6 @@
 package com.blockchain.tutorial.struct;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,6 +49,31 @@ public class Blockchain {
 
 	public List<Block> getBlocks() {
 		return blocks;
+	}
+
+	// public (){
+	// Iterator<Block> iterator = blocks.iterator();
+	// }
+
+	public void findSpendableOutputs(String address, int amount) {
+
+		findUnspentTransactions(address);
+
+	}
+
+	public void findUnspentTransactions(String address) {
+		Iterator<Block> bci = blocks.iterator();
+		while (bci.hasNext()) {
+			Block next = bci.next();
+
+			for (Transaction transaction : next.getTransactions()) {
+				String txID = Hex.encodeHexString(transaction.getId());
+
+				for (TXOutput txOutput : transaction.getVout()) {
+					
+				}
+			}
+		}
 	}
 
 	public static void main(String[] args) {

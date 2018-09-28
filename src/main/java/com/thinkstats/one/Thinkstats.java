@@ -1,10 +1,6 @@
 package com.thinkstats.one;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
-
-import com.google.common.collect.Lists;
 
 public class Thinkstats {
 

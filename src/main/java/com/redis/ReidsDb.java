@@ -1,9 +1,9 @@
 package com.redis;
 
-import java.util.function.Function;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+
+import java.util.function.Function;
 
 public class ReidsDb {
 

@@ -1,12 +1,10 @@
 package com.rpc.proxy;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
+import com.rpc.SayHelloService;
 
 import javax.net.SocketFactory;
-
-import com.google.common.collect.Lists;
-import com.rpc.SayHelloService;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 
 public class ProxyMain {

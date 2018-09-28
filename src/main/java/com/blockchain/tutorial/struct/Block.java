@@ -8,6 +8,8 @@ public class Block {
 	private long time;
 
 	private byte[] date;
+	
+	private Transaction [] transactions;
 
 	private byte[] prevBlockHash;
 
@@ -49,5 +51,9 @@ public class Block {
 
 	public void setHash(byte[] hash) {
 		Hash = hash;
+	}
+
+	public Transaction[] getTransactions() {
+		return transactions;
 	}
 }
