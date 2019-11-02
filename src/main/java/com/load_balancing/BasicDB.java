@@ -179,20 +179,4 @@ public class BasicDB {
 		flush();
 		db.close();
 	}
-
-	public static void main(String[] args) throws IOException {
-		String path = "D:\\tmp\\";
-		String name = "tmp_";
-		BasicDB basicDB = new BasicDB(path, name);
-		String key = "地域";
-		String value = "上海";
-
-		basicDB.put(key, value.getBytes());
-
-		key = "性别";
-		value = "男";
-		basicDB.put(key, value.getBytes());
-		
-		basicDB.close();
-	}
 }
