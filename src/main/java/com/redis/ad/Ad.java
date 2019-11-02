@@ -1,8 +1,9 @@
 package com.redis.ad;
 
-import com.redis.ReidsDb;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
+
+import com.redis.ReidsDb;
 
 public class Ad {
 
